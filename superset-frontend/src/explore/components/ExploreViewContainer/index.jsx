@@ -70,6 +70,9 @@ import SaveModal from '../SaveModal';
 import DataSourcePanel from '../DatasourcePanel';
 import ConnectedExploreChartHeader from '../ExploreChartHeader';
 import ExploreContainer from '../ExploreContainer';
+import SaveChart from '../saveChart';
+import AllChart from '../AllChart';
+
 
 const propTypes = {
   ...ExploreChartPanel.propTypes,
@@ -93,6 +96,8 @@ const propTypes = {
   vizType: PropTypes.string,
   saveAction: PropTypes.string,
   isSaveModalVisible: PropTypes.bool,
+  isSaveChartVisible: PropTypes.bool,
+  isAllChartVisible: PropTypes.bool,
 };
 
 const ExplorePanelContainer = styled.div`
@@ -558,7 +563,6 @@ function ExploreViewContainer(props) {
   if (props.standalone) {
     return renderChartContainer();
   }
-
   return (
     <ExploreContainer>
       <ConnectedExploreChartHeader
@@ -709,6 +713,30 @@ function ExploreViewContainer(props) {
           dashboardId={props.dashboardId}
         />
       )}
+      {props.isSaveChartVisible && (
+        <SaveChart
+        controls={props.controls}
+          addDangerToast={props.addDangerToast}
+          actions={props.actions}
+          form_data={props.form_data}
+          sliceName={props.sliceName}
+          dashboardId={props.dashboardId}
+          chart={props.chart}
+        />
+      )}
+      {props.isAllChartVisible && (
+        <AllChart
+        onOpen={props.isAllChartVisible}
+        controls={props.controls}
+          addDangerToast={props.addDangerToast}
+          actions={props.actions}
+          form_data={props.form_data}
+          sliceName={props.sliceName}
+          dashboardId={props.dashboardId}
+          chart={props.chart}
+        />
+      )}
+      
     </ExploreContainer>
   );
 }
@@ -730,6 +758,8 @@ function mapStateToProps(state) {
     reports,
     user,
     saveModal,
+    saveChart,
+    AllChart
   } = state;
   const { controls, slice, datasource, metadata, hiddenFormData } = explore;
   const hasQueryMode = !!controls.query_mode?.value;
@@ -790,6 +820,8 @@ function mapStateToProps(state) {
     metadata,
     saveAction: explore.saveAction,
     isSaveModalVisible: saveModal.isVisible,
+    isSaveChartVisible: saveChart.isVisible,
+    isAllChartVisible: AllChart.isVisible,
   };
 }
 

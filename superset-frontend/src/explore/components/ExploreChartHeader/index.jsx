@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { useCallback, useEffect, useState } from 'react';
+import  React, {useCallback, useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -29,10 +29,13 @@ import Icons from 'src/components/Icons';
 import PropertiesModal from 'src/explore/components/PropertiesModal';
 import { sliceUpdated } from 'src/explore/actions/exploreActions';
 import { PageHeaderWithActions } from 'src/components/PageHeaderWithActions';
-import { setSaveChartModalVisibility } from 'src/explore/actions/saveModalActions';
+import MetadataBar, { MetadataType } from 'src/components/MetadataBar';
+import { setSaveChartModalVisibility,newSetSaveChartModalVisibility,setAllChartModalVisibility } from 'src/explore/actions/saveModalActions';
 import { applyColors, resetColors } from 'src/utils/colorScheme';
 import { useExploreAdditionalActionsMenu } from '../useExploreAdditionalActionsMenu';
 import { useExploreMetadataBar } from './useExploreMetadataBar';
+import saveChart from '../saveChart';
+import AllChart from '../AllChart';
 
 const propTypes = {
   actions: PropTypes.object.isRequired,
@@ -49,6 +52,8 @@ const propTypes = {
   timeout: PropTypes.number,
   chart: chartPropShape,
   saveDisabled: PropTypes.bool,
+  visible: true,
+  onCancel: false
 };
 
 const saveButtonStyles = theme => css`
@@ -86,6 +91,7 @@ export const ExploreChartHeader = ({
   const dispatch = useDispatch();
   const { latestQueryFormData, sliceFormData } = chart;
   const [isPropertiesModalOpen, setIsPropertiesModalOpen] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false);
   const updateCategoricalNamespace = async () => {
     const { dashboards } = metadata || {};
     const dashboard =
@@ -116,6 +122,10 @@ export const ExploreChartHeader = ({
     }
   };
 
+  // console.log(sliceName);
+  
+
+
   useEffect(() => {
     updateCategoricalNamespace();
   }, []);
@@ -131,6 +141,16 @@ export const ExploreChartHeader = ({
   const showModal = useCallback(() => {
     dispatch(setSaveChartModalVisibility(true));
   }, [dispatch]);
+
+  //Changed
+  const newShowModal = useCallback(() => {
+    dispatch(newSetSaveChartModalVisibility(true));
+  },[dispatch])
+  //End
+
+  const showAllChartModal = useCallback(() => {
+    dispatch(setAllChartModalVisibility(true));
+  },[dispatch])
 
   const updateSlice = useCallback(
     slice => {
@@ -148,6 +168,10 @@ export const ExploreChartHeader = ({
     },
     [redirectSQLLab, history],
   );
+
+  const openModal = () => {
+    setModalOpen(true);
+  };
 
   const [menu, isDropdownVisible, setIsDropdownVisible] =
     useExploreAdditionalActionsMenu(
@@ -223,6 +247,33 @@ export const ExploreChartHeader = ({
               >
                 <Icons.SaveOutlined iconSize="l" />
                 {t('Save')}
+              </Button>
+              <Button
+                buttonStyle="secondary"
+                onClick={newShowModal}
+                disabled={saveDisabled}
+                data-test="query-save-button"
+                css={saveButtonStyles}
+              >
+                <Icons.SaveOutlined iconSize="l" />
+                {t('Create new Chart')}
+              </Button>
+              <Button
+                buttonStyle="secondary"
+                onClick={
+                  ()=>{
+                    openModal();
+                    showAllChartModal();
+                    <AllChart isModalOpen={isModalOpen} setModalOpen={setModalOpen} 
+                    />
+                  }
+                }
+                disabled={saveDisabled}
+                data-test="query-save-button"
+                css={saveButtonStyles}
+              >
+                <Icons.SaveOutlined iconSize="l" />
+                {t('Create All Chart')}
               </Button>
             </div>
           </Tooltip>

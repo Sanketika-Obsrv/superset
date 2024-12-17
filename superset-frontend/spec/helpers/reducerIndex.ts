@@ -31,6 +31,8 @@ import explore from 'src/explore/reducers/exploreReducer';
 import sqlLab from 'src/SqlLab/reducers/sqlLab';
 import reports from 'src/features/reports/ReportModal/reducer';
 import getBootstrapData from 'src/utils/getBootstrapData';
+import saveChart from 'src/explore/reducers/saveChartReducer';
+import AllChart from 'src/explore/reducers/allChartReducer';
 
 const impressionId = (state = '') => state;
 
@@ -56,6 +58,8 @@ export default {
   messageToasts,
   sliceEntities,
   saveModal,
+  saveChart,
+  AllChart,
   explore,
   sqlLab,
   localStorageUsageInKilobytes: noopReducer(0),
