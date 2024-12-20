@@ -1,15 +1,30 @@
 import React, {  useState } from 'react'
 import { Form, FormItem } from 'src/components/Form';
 import { Input } from 'src/components/Input';
-import {  t } from '@superset-ui/core';
+import {  t,useTheme } from '@superset-ui/core';
 import '../saveChart.css'
 import { store } from 'src/views/store';
+import { AddControlLabel, DndLabelsContainer } from '../controls/OptionControls';
+import Icons from 'src/components/Icons';
+import dayjs from 'dayjs';
 
 const AreaChart = (props:any) => {
+  const a = dayjs()
+
+// Get dynamic date values using dayjs
+const startDate = dayjs().subtract(7, 'days')
+// .startOf('day').format('YYYY-MM-DD HH:mm:ss.SSSSSS');
+const endDate = dayjs().add(20,'days')
+// .startOf('day').format('YYYY-MM-DD HH:mm:ss.SSSSSS');
+
   // console.log({props});
+  const theme = useTheme();
   const { chart, controls, form_data } = props.props;
   const [x_axis,setX_axis] = useState(controls.x_axis?.value);
-  const [y_axis,setY_axis] = useState(form_data.groupby ? form_data.groupby[0]: undefined);
+  // const [y_axis,setY_axis] = useState(form_data.groupby ? form_data.groupby[0]: undefined);
+  const [y_axis, setY_axis] = useState<string[]>(
+    form_data.groupby ? [form_data.groupby[0]] : []
+  );
   const [metric,setMetric] = useState(form_data?.metric ? form_data?.metric?.column?.column_name : undefined);
   const [metrics,setMetrics] = useState(form_data?.metrics ? form_data?.metrics[0]?.column?.column_name : undefined);
   const [distribute,setDistribute] = useState(form_data?.columns ? form_data?.columns[0] : undefined);
@@ -22,7 +37,17 @@ const AreaChart = (props:any) => {
   // const metric = charts.explore.form_data?.metrics;
   
   console.log(metric);
-  
+  function renderGhostButton() {
+    return (
+      <AddControlLabel
+        cancelHover={!props.onClickGhostButton}
+        onClick={props.onClickGhostButton}
+      >
+        <Icons.PlusSmall iconColor={theme.colors.grayscale.light1} />
+        {/* {t(props.ghostButtonText)} */}
+      </AddControlLabel>
+    );
+  }
   const handleChangeForCols = (event: { target: { value: any; }; }) => {
     setCols(event.target.value); 
   };
@@ -38,8 +63,12 @@ const AreaChart = (props:any) => {
   const handleChangeForX = (event: { target: { value: any; }; }) => {
     setX_axis(event.target.value); 
   };
-  const handleChangeForY = (event: { target: { value: any; }; }) => {
-    setY_axis(event.target.value); 
+  // const handleChangeForY = (event: { target: { value: any; }; }) => {
+  //   setY_axis(event.target.value); 
+  // };
+  const handleChangeForY = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedOptions = Array.from(event.target.selectedOptions, (option) => option.value);
+    setY_axis(selectedOptions);
   };
   const handleChangeForMetrics = (event: { target: { value: any; }; }) => {
     setMetrics(event.target.value); 
@@ -133,7 +162,7 @@ const AreaChart = (props:any) => {
 
       {y_axis !== undefined  && (
           <div className='dropdown-container'>
-            <label htmlFor="dropdown">Y-axis </label>
+            <label htmlFor="dropdown">Dimensions </label>
             <select id="dropdown" value={y_axis} onChange={handleChangeForY}>
               {columnNames.map((name: string, index: number) => (
                 <option key={index} value={name}>
@@ -143,6 +172,44 @@ const AreaChart = (props:any) => {
             </select>
           </div>
       )}
+
+      {/* <div>
+      {y_axis.length > 0 && (
+        <div className="dropdown-container">
+          <label htmlFor="dropdown">Dimensions </label>
+          <select
+            id="dropdown"
+            value={y_axis}
+            onChange={handleChangeForY}
+            multiple
+          >
+            {columnNames.map((name: string, index: number) => (
+              <option key={index} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      <div className="selected-dimensions">
+        <ul>
+          {y_axis.map((dimension, index) => (
+            <li key={index}>{dimension}</li>
+          ))}
+        </ul>
+      </div>
+      <div className="data-display">
+        {y_axis.map((dimension, index) => (
+          <div key={index}>
+            <h5>{`Data for ${dimension}`}</h5>
+            <p>{`Mocked data content for ${dimension}`}</p>
+          </div>
+        ))}
+      </div>
+    </div> */}
+
+
       {/* {controls?.metrics?.column === 1 
       ? 
         <FormItem label={t('Metric')} required>
