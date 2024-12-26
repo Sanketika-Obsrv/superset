@@ -18,6 +18,9 @@ import BubbleChart from './Chart/BubbleChart';
 import Bubble from './Chart/Bubble';
 import DeckChart from './Chart/DeckChart';
 import EventChart from './Chart/EventChart';
+import { lowerFirst } from 'lodash';
+import {  newQuery } from './utils/ModifiedQuery';
+import DndSelectLabel from 'src/explore/components/controls/DndColumnSelectControl/DndSelectLabel';
 export const StyledModal = styled(Modal)`
   .ant-modal-body {
     overflow: visible;
@@ -48,100 +51,52 @@ const AllChart = (props: any) => {
   const [name,setName] = useState(props.sliceName);
   const [query,setQuery] = useState(reduxQuery);
   const [timeCol,setTimeCol] = useState(props?.form_data?.granularity_sqla ? props?.form_data?.granularity_sqla : undefined);
-  const [filters,setFilters] = useState(store.getState().charts[sliceId].queriesResponse[0]?.applied_filters[0]?.column);
   console.log({ charts });
   const dispatch = useDispatch();
   console.log({props});
   
-  console.log(store.getState());
-
-
-  // SELECT DATE_TRUNC('month', order_date) AS order_date, product_line AS product_line, sum(sales) 
-  // AS "(Sales)" FROM public.cleaned_sales_data WHERE order_date >= 
-  // TO_TIMESTAMP('2024-01-01 00:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.US')AND order_date < 
-  // TO_TIMESTAMP('2025-01-01 00:00:00.000000', 'YYYY-MM-DD HH24:MI:SS.US') 
-  // GROUP BY DATE_TRUNC('month', order_date),
-  //   product_line ORDER BY "(Sales)" DESC  LIMIT 50000;
-
-  function modifyQueryToRelative(query: string) {
-    const timestampPattern = /TO_TIMESTAMP\('(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+)',\s*'YYYY-MM-DD HH24:MI:SS.US'\)/g;
-    
-    const now = new Date();
+  const checkTimeInterval = charts?.explore?.form_data?.adhoc_filters[0]?.comparator;
+  const operator = charts?.explore?.form_data?.adhoc_filters[0]?.operator;
+  const filters = charts?.explore?.form_data?.adhoc_filters;
+  console.log(operator);
   
-    return query.replace(timestampPattern, (_: any, hardcodedDate: string | number | Date) => {
-      const parsedDate = new Date(hardcodedDate);
-      
-      const diffTime = now.getTime() - parsedDate.getTime(); 
-  
-      let diffInDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-      let diffInMonths = Math.floor(diffInDays / 30);
-      let diffInYears = Math.floor(diffInMonths / 12);
 
-    //   if (diffInDays !== 0) {
-    //     if(diffInMonths !== 0) {
-    //       if(diffInYears !== 0){
-    //         return `TIMESTAMPADD(DAY, ${-diffInDays},TIMESTAMPADD(MONTH, ${-diffInMonths},TIMESTAMPADD(YEAR, ${-diffInYears}, CURRENT_TIMESTAMP)`
-    //       }else {
-    //         return `TIMESTAMPADD(DAY, ${-diffInDays},TIMESTAMPADD(MONTH, ${-diffInMonths}, CURRENT_TIMESTAMP)`
-    //       }
-    //     }else {
-    //       return `TIMESTAMPADD(DAY, ${-diffInDays}, CURRENT_TIMESTAMP)`;
-    //     }
-    //   }
-    //    else if (diffInMonths !== 0) {
-    //     if(diffInYears !== 0){
-    //       return `TIMESTAMPADD(MONTH, ${-diffInMonths},TIMESTAMPADD(YEAR, ${-diffInYears}, CURRENT_TIMESTAMP)`
-    //   }else {
-    //     return `TIMESTAMPADD(MONTH, ${-diffInMonths}, CURRENT_TIMESTAMP)`;
-    //   } 
-    // }
-    //   else {
-    //     return `TIMESTAMPADD(DAY, ${-diffInDays}, CURRENT_TIMESTAMP)`;
-    //   }
 
-      return `TIMESTAMPADD(DAY, ${-diffInDays}, CURRENT_TIMESTAMP)`;
-    
-    
-    });
+
+let check = false;
+// const modifiedQuery = modifyQueryToRelative(query,checkTimeInterval);
+// console.log(modifiedQuery);
+console.log("query->",query);
+
+const newQuery1 = newQuery(query,filters);
+// console.log(newQuery1);
+
+function modifyWhereClause(query: string, newWhereClause: string) {
+  try {
+    const whereRegex = /WHERE(.*?)(GROUP BY|ORDER BY|LIMIT|$)/s;
+
+    const match = query?.match(whereRegex);
+
+    if (!match) {
+      throw new Error("No WHERE clause found in the query");
+    }
+
+    const originalWhere = match[1];
+    const trailingPart = match[2] || ""; 
+    const modifiedQuery = query.replace(
+      `WHERE${originalWhere}${trailingPart}`,
+      `WHERE ${newWhereClause} ${trailingPart}`
+    );
+
+    return modifiedQuery;
+  } catch (error) {
+    console.error("Error modifying the WHERE clause:", error.message);
+    return query; 
   }
-//   TIMESTAMPADD(DAY, -10, 
-//     TIMESTAMPADD(MONTH, -6, 
-//         TIMESTAMPADD(YEAR, -11, CURRENT_TIMESTAMP)
-//     )
-// )
+}
 
-// function modifyQueryToRelative(query: string) {
-//   const timestampPattern = /TO_TIMESTAMP\('(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+)',\s*'YYYY-MM-DD HH24:MI:SS.US'\)/g;
-
-//   const now = new Date();
-
-//   return query.replace(timestampPattern, (_: any, hardcodedDate: string | number | Date) => {
-//     const parsedDate = new Date(hardcodedDate);
-
-//     const diffTime = now.getTime() - parsedDate.getTime();
-
-//     const diffInDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-//     const diffInMonths = Math.floor(diffInDays / 30);
-//     const diffInYears = Math.floor(diffInMonths / 12);
-
-//     let queryAdjustment = `TIMESTAMPADD(YEAR, ${-diffInYears}, CURRENT_TIMESTAMP)`;
-
-//     if (diffInMonths !== 0) {
-//       queryAdjustment = `TIMESTAMPADD(MONTH, ${-diffInMonths%12}, ${queryAdjustment})`;
-//     }
-
-//     if (diffInDays !== 0) {
-//       queryAdjustment = `TIMESTAMPADD(DAY, ${-diffInDays%365}, ${queryAdjustment})`;
-//     }
-
-//     return queryAdjustment;
-//   });
-// }
-
-
-const modifiedQuery = modifyQueryToRelative(query);
-console.log(modifiedQuery);
-
+const result = modifyWhereClause(query,newQuery1);
+console.log("result",result);
 
   
   const storeValue = store.getState().charts[sliceId];
@@ -149,6 +104,7 @@ console.log(modifiedQuery);
   console.log(chartName);
   const [timeInterval,setTimeInterval] = useState(props?.form_data?.adhoc_filters[0]?.comparator);
 
+  
 
 // console.log("time interval",timeInterval);
 // console.log("Time",charts?.explore?.slice?.form_data?.adhoc_filters[0]?.comparator);
@@ -207,13 +163,12 @@ console.log(modifiedQuery);
     "echarts_timeseries_step":<AreaChart/>,
     "sunburst_v2":<AreaChart/>,
     "table":<AreaChart/>,
-
+    "time_pivot":<AreaChart/>
     }
 
   const renderChildForms=()=>{
     return React.cloneElement(chartsmaps[chartName], {props}) 
   }
-  console.log(query);
 
   const columns = props?.controls?.adhoc_filters?.columns;
   const columnNames = columns.map((item: { column_name: any; }) => item.column_name);  
@@ -233,9 +188,7 @@ console.log(modifiedQuery);
     setTimeInterval(event.target.value); 
   };
 
-  const handleFiltersChange = (event: { target: { value: any; }; }) => {
-    setFilters(event.target.value);
-  };
+
 
   const handleCloseModal = useCallback(() => {
     dispatch(setAllChartModalVisibility(false));
@@ -246,6 +199,8 @@ console.log(modifiedQuery);
     setQuery('');
   }
 
+  
+  
 
   return (
     <>
@@ -277,30 +232,21 @@ console.log(modifiedQuery);
                 data-test="new-chart-name"
               />
             </FormItem>
-            {filters !== undefined  && (
-          <div className='dropdown-container'>
-            <label htmlFor="dropdown">Filters </label>
-            <select id="dropdown" value={filters} onChange={handleFiltersChange}>
-              {columnNames?.map((name: string, index: number) => (
-                <option key={index} value={name}>
-                  {name}
-                </option>
-              ))}
-            </select>
-          </div>
-      )}
+            
+            
       {timeInterval !== undefined && 
-     <div>
+      <div>
         <div>Time Column</div><br></br>
-     <Input
-            name="timeColumn"
-            type="text"
-            data-test="druid-sql-query"
-            value={timeInterval}
-            onChange={handleChangeForTimeInterval}
-          />
-     </div>
-        }
+          <Input
+                  name="timeColumn"
+                  type="text"
+                  data-test="druid-sql-query"
+                  value={timeInterval}
+                  onChange={handleChangeForTimeInterval}
+                />
+      </div>
+      }
+      
           </Form>
           {renderChildForms()}
           <div data-test="save-modal-footer">
