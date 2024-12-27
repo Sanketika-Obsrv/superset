@@ -1,15 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import LineChart from './Chart/LineChart';
 import AreaChart from './Chart/AreaChart';
 import { store } from 'src/views/store';
-import BarChart from './Chart/BarChart';
 import { Input } from 'src/components/Input';
 import { Form, FormItem } from 'src/components/Form';
 import { styled, t } from '@superset-ui/core';
 import Modal from 'src/components/Modal';
 import {setAllChartModalVisibility} from 'src/explore/actions/saveModalActions';
 import { useDispatch } from 'react-redux';
-import { any } from 'lodash/fp';
 import Button from 'src/components/Button';
 import Chord from './Chart/Chord';
 import CountryChart from './Chart/CountryChart';
@@ -18,9 +15,7 @@ import BubbleChart from './Chart/BubbleChart';
 import Bubble from './Chart/Bubble';
 import DeckChart from './Chart/DeckChart';
 import EventChart from './Chart/EventChart';
-import { lowerFirst } from 'lodash';
 import {  newQuery } from './utils/ModifiedQuery';
-import DndSelectLabel from 'src/explore/components/controls/DndColumnSelectControl/DndSelectLabel';
 export const StyledModal = styled(Modal)`
   .ant-modal-body {
     overflow: visible;
@@ -66,7 +61,7 @@ const AllChart = (props: any) => {
 let check = false;
 // const modifiedQuery = modifyQueryToRelative(query,checkTimeInterval);
 // console.log(modifiedQuery);
-console.log("query->",query);
+console.log(query);
 
 const newQuery1 = newQuery(query,filters);
 // console.log(newQuery1);
@@ -85,7 +80,7 @@ function modifyWhereClause(query: string, newWhereClause: string) {
     const trailingPart = match[2] || ""; 
     const modifiedQuery = query.replace(
       `WHERE${originalWhere}${trailingPart}`,
-      `WHERE ${newWhereClause} ${trailingPart}`
+      `${newWhereClause} ${trailingPart}`
     );
 
     return modifiedQuery;
@@ -96,7 +91,7 @@ function modifyWhereClause(query: string, newWhereClause: string) {
 }
 
 const result = modifyWhereClause(query,newQuery1);
-console.log("result",result);
+console.log(result);
 
   
   const storeValue = store.getState().charts[sliceId];

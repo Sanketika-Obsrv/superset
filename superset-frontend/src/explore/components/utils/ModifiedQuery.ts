@@ -99,7 +99,7 @@ export function newQuery(query: string, filters: any[]): string {
 
   const currentDayComparatorFn = (filter: any): string => {
     const remainingHr = 24 - hours;
-    return `${filter.subject} >= TIMESTAMPADD(HOUR, ${-hours}, CURRENT_TIMESTAMP) AND ${filter.subject} < TIMESTAMPADD(HOUR, ${remainingHr}, CURRENT_TIMESTAMP)`;
+    return `${filter.subject} >= TIMESTAMPADD(HOUR, ${-hours}, CURRENT_TIMESTAMP) AND ${filter.subject} <= TIMESTAMPADD(HOUR, ${remainingHr}, CURRENT_TIMESTAMP)`;
   }
 
   const currentWeekComparatorFn = (filter: any): string => {
@@ -189,7 +189,7 @@ export function newQuery(query: string, filters: any[]): string {
   };
   
   const currentTimeComparatorFn = (filter: any): string => {
-    return `${filter.subject} >= TIMESTAMPADD(HOUR, ${0}, CURRENT_TIMESTAMP) AND ${filter.subject} < TIMESTAMPADD(HOUR, ${0}, CURRENT_TIMESTAMP)`;
+    return `${filter.subject} >= TIMESTAMPADD(SECOND, ${0}, CURRENT_TIMESTAMP) AND ${filter.subject} < TIMESTAMPADD(SECOND, ${0}, CURRENT_TIMESTAMP)`;
   }
 
   const currentTimeToRelativeComparatorFn = (filter: any): string => {
@@ -233,12 +233,11 @@ export function newQuery(query: string, filters: any[]): string {
     const dateTime = match[1];
   
     const sqlDateTime = dateTime.replace("T", " ");
-  
-    return `${filter.subject} >= TIMESTAMPADD(HOUR, 0, CURRENT_TIMESTAMP) AND ${filter.subject} < TO_TIMESTAMP('${sqlDateTime}.000000', 'YYYY-MM-DD HH24:MI:SS.US')`;
-  };
+    return `${filter.subject} >= TIMESTAMPADD(SECOND, 0, CURRENT_TIMESTAMP) AND ${filter.subject} < TIMESTAMP '${sqlDateTime}'`;
+      };
   
   const todayComparatorFn = (filter: any): string => {
-    return `${filter.subject} >= TIMESTAMPADD(DAY, 0, CURRENT_TIMESTAMP) AND ${filter.subject} <= TIMESTAMPADD(DAY, 0, CURRENT_TIMESTAMP)`;
+    return `${filter.subject} >= TIMESTAMPADD(DAY, 0, CURRENT_TIMESTAMP) AND ${filter.subject} < TIMESTAMPADD(DAY, 0, CURRENT_TIMESTAMP)`;
   }
 
   const todayTillNowComparatorFn = (filter: any): string => {
@@ -277,18 +276,16 @@ export function newQuery(query: string, filters: any[]): string {
 
   const midnightTimeToSpecificDateComparatorFn = (filter: any): string => {
     const comparator = filter.comparator;
-  
     const match = comparator.match(/today : (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})/);
     if (!match) {
       throw new Error("Invalid comparator format for specific date-time");
     }
   
     const dateTime = match[1];
-  
-    const sqlDateTime = dateTime.replace("T", " ");
-  
-    return `${filter.subject} >= TIMESTAMPADD(HOUR, ${-hours}, CURRENT_TIMESTAMP) AND ${filter.subject} < TO_TIMESTAMP('${sqlDateTime}.000000', 'YYYY-MM-DD HH24:MI:SS.US')`;
+    const sqlDateTime = dateTime.replace("T", " "); 
+    return `${filter.subject} >= TIMESTAMPADD(HOUR, ${-hours}, CURRENT_TIMESTAMP) AND ${filter.subject} < TIMESTAMP '${sqlDateTime}'`;
   };
+  
 
   const relativeToNowComparatorFn = (filter: any): string => {
     const comparator = filter.comparator;
@@ -385,42 +382,39 @@ export function newQuery(query: string, filters: any[]): string {
 
   const relativeToSpecificComparatorFn = (filter: any): string => {
     const comparator = filter.comparator;
-
     const match = comparator.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})/);
     if (!match) {
       throw new Error("Invalid comparator format for specific date-time");
     }
   
     const dateTime = match[1];
-  
     const sqlDateTime = dateTime.replace("T", " ");
   
     const match1 = comparator.match(/DATEADD\(DATETIME\("([^"]+)"\), (-?\d+), (\w+)\)/);
-  
     if (!match1) {
       throw new Error("Invalid comparator format for DATEADD");
     }
   
     const value = parseInt(match1[2], 10); 
     const unit = match1[3]; 
-  
     const unitMap: { [key: string]: string } = {
-      "second": "SECOND",
-      "minute": "MINUTE",
-      "hour": "HOUR",
-      "day": "DAY",
-      "week": "WEEK",
-      "month": "MONTH",
-      "quarter": "QUARTER",
-      "year": "YEAR"
+      second: "SECOND",
+      minute: "MINUTE",
+      hour: "HOUR",
+      day: "DAY",
+      week: "WEEK",
+      month: "MONTH",
+      quarter: "QUARTER",
+      year: "YEAR",
     };
   
     if (!unitMap[unit]) {
       throw new Error(`Unsupported time unit: ${unit}`);
     }
-    
-    return `${filter.subject} >= TIMESTAMPADD(${unitMap[unit]}, ${value}, CURRENT_TIMESTAMP) AND ${filter.subject} < TO_TIMESTAMP('${sqlDateTime}.000000', 'YYYY-MM-DD HH24:MI:SS.US')`;
+  
+    return `${filter.subject} >= TIMESTAMPADD(${unitMap[unit]}, ${value}, TIMESTAMP '${sqlDateTime}') AND ${filter.subject} < TIMESTAMP '${sqlDateTime}'`;
   };
+  
   
   const specificToMidnightComparatorFn = (filter: any): string => {
     const comparator = filter.comparator;
@@ -434,7 +428,7 @@ export function newQuery(query: string, filters: any[]): string {
   
     const sqlDateTime = dateTime.replace("T", " ");
     
-    return `${filter.subject} >= TO_TIMESTAMP('${sqlDateTime}.000000', 'YYYY-MM-DD HH24:MI:SS.US') AND ${filter.subject} < TIMESTAMPADD(HOUR, ${-hours}, CURRENT_TIMESTAMP)`;
+    return `${filter.subject} >= TIMESTAMP '${sqlDateTime}' AND ${filter.subject} < TIMESTAMPADD(HOUR, ${-hours}, CURRENT_TIMESTAMP)`;
   };
 
   const specificToNowComparatorFn = (filter: any): string => {
@@ -449,7 +443,7 @@ export function newQuery(query: string, filters: any[]): string {
   
     const sqlDateTime = dateTime.replace("T", " ");
     
-    return `${filter.subject} >= TO_TIMESTAMP('${sqlDateTime}.000000', 'YYYY-MM-DD HH24:MI:SS.US') AND ${filter.subject} < TIMESTAMPADD(SECOND, ${0}, CURRENT_TIMESTAMP)`;
+    return `${filter.subject} >= TIMESTAMP '${sqlDateTime}' AND ${filter.subject} < TIMESTAMPADD(SECOND, ${0}, CURRENT_TIMESTAMP)`;
   };
 
   const specificToRelativeComparatorFn = (filter: any): string => {
@@ -457,56 +451,52 @@ export function newQuery(query: string, filters: any[]): string {
 
     const match = comparator.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})/);
     if (!match) {
-      throw new Error("Invalid comparator format for specific date-time");
+        throw new Error("Invalid comparator format for specific date-time");
     }
-    const dateTime = match[1];
-    const sqlDateTime = dateTime.replace("T", " ");
+    const dateTime = match[1]; 
+    const sqlDateTime = dateTime.replace("T", " "); 
+
     const match1 = comparator.match(/DATEADD\(DATETIME\("([^"]+)"\), (-?\d+), (\w+)\)/);
-  
     if (!match1) {
-      throw new Error("Invalid comparator format for DATEADD");
+        throw new Error("Invalid comparator format for DATEADD");
     }
-  
+
     const value = parseInt(match1[2], 10); 
     const unit = match1[3]; 
     const unitMap: { [key: string]: string } = {
-      "second": "SECOND",
-      "minute": "MINUTE",
-      "hour": "HOUR",
-      "day": "DAY",
-      "week": "WEEK",
-      "month": "MONTH",
-      "quarter": "QUARTER",
-      "year": "YEAR"
+        "second": "SECOND",
+        "minute": "MINUTE",
+        "hour": "HOUR",
+        "day": "DAY",
+        "week": "WEEK",
+        "month": "MONTH",
+        "quarter": "QUARTER",
+        "year": "YEAR",
     };
-  
-    if (!unitMap[unit]) {
-      throw new Error(`Unsupported time unit: ${unit}`);
-    }
-    
-    return `${filter.subject} >= TO_TIMESTAMP('${sqlDateTime}.000000', 'YYYY-MM-DD HH24:MI:SS.US')  AND ${filter.subject} < TIMESTAMPADD(${unitMap[unit]}, ${value}, CURRENT_TIMESTAMP)`;
-  };
 
-  const specificToSpecificComparatorFn = (filter: any): string => {
-    const comparator = filter.comparator;
-  
-    const match = comparator.match(/([\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2})\s*:\s*([\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2})/);
-  
-    if (match) {
-      const startTimestamp = match[1];
-      const endTimestamp = match[2];
-  
-      return `${filter.subject} >= TO_TIMESTAMP('${startTimestamp.replace(
-        "T",
-        " "
-      )}.000000', 'YYYY-MM-DD HH24:MI:SS.US') AND ${filter.subject} < TO_TIMESTAMP('${endTimestamp.replace(
-        "T",
-        " "
-      )}.000000', 'YYYY-MM-DD HH24:MI:SS.US')`;
-    } else {
-      throw new Error("Invalid comparator format for specific timestamps");
+    if (!unitMap[unit]) {
+        throw new Error(`Unsupported time unit: ${unit}`);
     }
-  };
+
+    return `${filter.subject} >= TIMESTAMP '${sqlDateTime}' 
+        AND ${filter.subject} < TIMESTAMPADD(${unitMap[unit]}, ${value}, TIMESTAMP '${sqlDateTime}')`;
+};
+
+const specificToSpecificComparatorFn = (filter: any): string => {
+  const comparator = filter.comparator;
+
+  const match = comparator.match(/([\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2})\s*:\s*([\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2})/);
+
+  if (match) {
+      const startTimestamp = match[1].replace("T", " "); 
+      const endTimestamp = match[2].replace("T", " "); 
+
+      return `${filter.subject} >= TIMESTAMP '${startTimestamp}' AND ${filter.subject} < TIMESTAMP '${endTimestamp}'`;
+  } else {
+      throw new Error("Invalid comparator format for specific timestamps");
+  }
+};
+
   
   
   const generateWhereClause = (filter: any): string => {
@@ -588,7 +578,6 @@ export function newQuery(query: string, filters: any[]): string {
   };
 
   function processTemporalRangeFilters(filters: any[]): string {
-    console.log("filters are",filters);
     
     const timeRangeFilters = filters.filter(
       (filter) => filter.operator === "TEMPORAL_RANGE"
@@ -623,7 +612,10 @@ export function newQuery(query: string, filters: any[]): string {
         case "LIKE":
         case "NOT LIKE":
           return `${subject} ${operator} '${comparator}'`;
-    
+        
+        case "ILIKE": 
+        return `${subject} ILIKE '${comparator}'`;
+        
         case "IS NULL":
         case "IS NOT NULL":
           return `${subject} ${operator}`;
@@ -633,14 +625,11 @@ export function newQuery(query: string, filters: any[]): string {
       }
     });
     
-    
     const filterClauses = timeRangeFilters.map(generateWhereClause);
     const validClauses = filterClauses.filter((clause) => clause.trim() !== "");
     const allClauses = [...validClauses, ...otherClauses];
     return allClauses.length > 0 ? `WHERE ${allClauses.join(" AND ")}` : "";
   
   }
-  
-
   return processTemporalRangeFilters(filters); 
 }
