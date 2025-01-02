@@ -16,6 +16,7 @@ import Bubble from './Chart/Bubble';
 import DeckChart from './Chart/DeckChart';
 import EventChart from './Chart/EventChart';
 import {  newQuery } from './utils/ModifiedQuery';
+import DndSelectLabel from 'src/explore/components/controls/DndColumnSelectControl/DndSelectLabel';
 export const StyledModal = styled(Modal)`
   .ant-modal-body {
     overflow: visible;
@@ -46,6 +47,8 @@ const AllChart = (props: any) => {
   const [name,setName] = useState(props.sliceName);
   const [query,setQuery] = useState(reduxQuery);
   const [timeCol,setTimeCol] = useState(props?.form_data?.granularity_sqla ? props?.form_data?.granularity_sqla : undefined);
+  const [metrics,setMetrics] = useState(props?.form_data?.metrics ? props?.form_data?.metrics[0]?.column?.column_name : undefined);
+  const [columnValueNames, setColumnValueNames] = useState<string[]>([]);
   console.log({ charts });
   const dispatch = useDispatch();
   console.log({props});
@@ -53,9 +56,7 @@ const AllChart = (props: any) => {
   const checkTimeInterval = charts?.explore?.form_data?.adhoc_filters[0]?.comparator;
   const operator = charts?.explore?.form_data?.adhoc_filters[0]?.operator;
   const filters = charts?.explore?.form_data?.adhoc_filters;
-  console.log(operator);
   
-
 
 
 let check = false;
@@ -143,7 +144,7 @@ console.log(result);
     "histogram":<BigNumberTotal/>,
     "horizon":<BigNumberTotal/>,
     "mapbox":<BigNumberTotal/>,
-    // "mixed_timeseries":<AreaChart/>,
+    "mixed_timeseries":<AreaChart/>,
     "rose":<AreaChart/>,
     "paired_ttest":<AreaChart/>,
     "para":<AreaChart/>,
@@ -152,19 +153,26 @@ console.log(result);
     "pivot_table_v2":<AreaChart/>,
     "radar":<AreaChart/>,
     "sankey_v2":<Chord/>,
-    // "sankey":<Chord/>,
+    "sankey":<Chord/>,
     "echarts_timeseries_scatter":<AreaChart/>,
     "echarts_timeseries_smooth":<AreaChart/>,
     "echarts_timeseries_step":<AreaChart/>,
     "sunburst_v2":<AreaChart/>,
     "table":<AreaChart/>,
-    "time_pivot":<AreaChart/>
+    "time_pivot":<AreaChart/>,
+    "waterfall":<AreaChart/>,
+    "time_table":<AreaChart/>,
+    "tree_chart":<AreaChart/>,
+    "treemap_v2":<AreaChart/>,
+    "word_cloud":<AreaChart/>,
+    "world_map":<AreaChart/>,
+
     }
 
   const renderChildForms=()=>{
     return React.cloneElement(chartsmaps[chartName], {props}) 
   }
-
+  
   const columns = props?.controls?.adhoc_filters?.columns;
   const columnNames = columns.map((item: { column_name: any; }) => item.column_name);  
 
@@ -194,8 +202,7 @@ console.log(result);
     setQuery('');
   }
 
-  
-  
+console.log(name);
 
   return (
     <>
@@ -208,44 +215,35 @@ console.log(result);
         >
           <Form data-test="save-modal-body" layout="vertical">
           <FormItem label={t('Chart name')} required>
-              <Input
+              <div className='outer-div'>
+              <Input 
                 name="new_slice_name"
                 type="text"
                 placeholder="Name"
                 value={name}
                 onChange={handleNameChange}
                 data-test="new-chart-name"
+                className='col-set'
               />
+              </div>
             </FormItem>
             <FormItem label={t('Druid SQL Query')} required>
-              <Input
-                name="new_druid_sql_query"
+              <div className='outer-div'> 
+              <Input 
+                name="new_slice_name"
                 type="text"
-                placeholder="SQL_Query"
+                placeholder="Name"
                 value={query}
                 onChange={handleQueryChange}
                 data-test="new-chart-name"
+                className='col-set'
               />
+              </div>
             </FormItem>
-            
-            
-      {timeInterval !== undefined && 
-      <div>
-        <div>Time Column</div><br></br>
-          <Input
-                  name="timeColumn"
-                  type="text"
-                  data-test="druid-sql-query"
-                  value={timeInterval}
-                  onChange={handleChangeForTimeInterval}
-                />
-      </div>
-      }
-      
           </Form>
           {renderChildForms()}
           <div data-test="save-modal-footer">
-      <Button id="btn_cancel" 
+      {/* <Button id="btn_cancel" 
       buttonSize='small' 
       buttonStyle='danger' 
       onClick={() => {
@@ -253,7 +251,7 @@ console.log(result);
       }}
       >
         {t('Reset')}
-      </Button>
+      </Button> */}
       {/* <Button
         id="btn_modal_save"
         buttonStyle="primary"

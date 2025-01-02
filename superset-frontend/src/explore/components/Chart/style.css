@@ -1,0 +1,54 @@
+/* General container for the entire component */
+.container-chart {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Section for filters, dimensions, and metrics */
+  .section {
+    display: flex;
+    flex-direction: column;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    /* padding: 8px; */
+    background-color: white; /* Light background color for the section */
+  }
+  
+  /* Label for each section (Metrics, Columns, Filters, etc.) */
+  .column-label {
+    margin-bottom: 5px;
+    font-size: 14px; /* Same size as form items */
+    font-weight: normal;
+    color: #333;
+  }
+  .column-set{
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  /* Each individual column value inside the section */
+  .column {
+    padding: 5px 10px;
+    background-color: #f3f3f3;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: normal;
+    margin: 5px;
+    color: black;
+    border: 1px solid #ccc; 
+  }
+  .column.input {
+    outline: none; 
+    box-sizing: border-box; 
+    width: 100%; 
+  }
+  .col-set{
+    background-color: #f3f3f3;
+    border-radius: 4px;
+    font-size: 14px;
+    color: black;
+  }
+  .outer-div{
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
