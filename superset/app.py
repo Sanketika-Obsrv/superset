@@ -22,9 +22,13 @@ from typing import Optional
 from flask import Flask
 
 from superset.initialization import SupersetAppInitializer
+from superset.initialization.api import API
 
 logger = logging.getLogger(__name__)
 
+from flask_wtf.csrf import CSRFProtect
+
+csrf = CSRFProtect()
 
 def create_app(superset_config_module: Optional[str] = None) -> Flask:
     app = SupersetApp(__name__)
@@ -39,6 +43,11 @@ def create_app(superset_config_module: Optional[str] = None) -> Flask:
         app_initializer = app.config.get("APP_INITIALIZER", SupersetAppInitializer)(app)
         app_initializer.init_app()
 
+        csrf.init_app(app)
+        csrf.exempt("/charts")
+
+        app.add_url_rule('/charts', 'create_chart', API.create_chart, methods=["POST"])
+        app.add_url_rule('/charts', 'get_charts', API.get_charts, methods=["GET"])
         return app
 
     # Make sure that bootstrap errors ALWAYS get logged
@@ -49,3 +58,4 @@ def create_app(superset_config_module: Optional[str] = None) -> Flask:
 
 class SupersetApp(Flask):
     pass
+

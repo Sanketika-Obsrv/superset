@@ -17,6 +17,8 @@ import DeckChart from './Chart/DeckChart';
 import EventChart from './Chart/EventChart';
 import {  newQuery } from './utils/ModifiedQuery';
 import DndSelectLabel from 'src/explore/components/controls/DndColumnSelectControl/DndSelectLabel';
+import callApi from 'packages/superset-ui-core/src/connection/callApi/callApi';
+import axios from 'axios';
 export const StyledModal = styled(Modal)`
   .ant-modal-body {
     overflow: visible;
@@ -79,17 +81,23 @@ function modifyWhereClause(query: string, newWhereClause: string) {
 
     const originalWhere = match[1];
     const trailingPart = match[2] || ""; 
-    const modifiedQuery = query.replace(
+    let modifiedQuery = query.replace(
       `WHERE${originalWhere}${trailingPart}`,
       `${newWhereClause} ${trailingPart}`
     );
-
+    modifiedQuery = modifiedQuery.trim(); 
+    if (modifiedQuery.endsWith(";")) {
+      modifiedQuery = modifiedQuery.slice(0, -1); 
+    }
+    
     return modifiedQuery;
   } catch (error) {
     console.error("Error modifying the WHERE clause:", error.message);
     return query; 
   }
 }
+
+
 
 const result = modifyWhereClause(query,newQuery1);
 console.log(result);
@@ -187,10 +195,27 @@ console.log(result);
     setQuery(event.target.value);
   };
 
-  const handleChangeForTimeInterval = (event: { target: { value: any; }; }) => {
-    setTimeInterval(event.target.value); 
-  };
 
+
+  const callApi = async () => {
+    const data = {
+        name: name || "default name",
+        query: query || "SELECT * FROM my_table;",
+        description: "This is a description",
+        type: "line",
+        configuration: { xAxis: "month", yAxis: "sales" }
+    };
+
+    try {
+        const response = await axios.post('http://localhost:8088/charts', data);
+        console.log('Response:', response.data); 
+    } catch (error) {
+        console.error('Error calling API:', error);
+        if (error.response) {
+            console.error('Response Data:', error.response.data);
+        }
+    }
+};
 
 
   const handleCloseModal = useCallback(() => {
@@ -240,6 +265,7 @@ console.log(name);
               />
               </div>
             </FormItem>
+            <Button onClick={callApi}>Call api</Button>
           </Form>
           {renderChildForms()}
           <div data-test="save-modal-footer">
