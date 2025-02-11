@@ -17,7 +17,7 @@ import DeckChart from './Chart/DeckChart';
 import EventChart from './Chart/EventChart';
 import {  newQuery } from './utils/ModifiedQuery';
 import {CHART_BASE_URL} from 'packages/superset-ui-core/src/connection/constants';
-import { addSuccessToast } from 'src/components/MessageToasts/actions';
+import { addDangerToast, addSuccessToast } from 'src/components/MessageToasts/actions';
 import { newSetSaveChartModalVisibility } from 'src/explore/actions/saveModalActions';
 import './AllChart.css';
 import BarChart from './Chart/BarChart';
@@ -53,12 +53,8 @@ const AllChart = (props: any) => {
   const charts = store.getState();
   const [name,setName] = useState(props.sliceName);
   const [query,setQuery] = useState(reduxQuery);
-  // console.log(reduxQuery,"reduxQuery");
   const [dbDimensions,setDbDimensions] = useState();
-  // console.log({ charts });
   const dispatch = useDispatch();
-  // console.log({props});
-  // console.log(query,"old query");
   
   const checkTimeInterval = charts?.explore?.form_data?.adhoc_filters[0]?.comparator;
   const operator = charts?.explore?.form_data?.adhoc_filters[0]?.operator;
@@ -93,7 +89,6 @@ function modifyWhereClause(query: string, newWhereClause: string) {
     return query; 
   }
 }
-// console.log("query",query);
 
 const [dbData,setDbData] = useState({});
 
@@ -107,13 +102,10 @@ const [dbName,setDbName] = useState();
   
   const storeValue = store.getState().charts[sliceId];
   const chartName = store?.getState()?.charts[sliceId]?.latestQueryFormData?.viz_type;
-  console.log(chartName);
+
   const [configuration,setConfiguration] = useState();
   const [description,setDescription] = useState<any>();
   
-
-// console.log("time interval",timeInterval);
-// console.log("Time",charts?.explore?.slice?.form_data?.adhoc_filters[0]?.comparator);
 
 
   const chartsmaps:any={
@@ -200,7 +192,7 @@ const [dbName,setDbName] = useState();
       const data = await response.json();
       setDbName(data.result.name);
       setDbData(data);
-console.log(data);
+// console.log(data);
 
       if (response.ok) {
         setName(data.result.name)
@@ -214,10 +206,10 @@ console.log(data);
           setQuery(result)
         }
       } else {
-        console.error(`Failed to get chart`);
+        // console.error(`Failed to get chart`);
       }
     } catch (error) {
-      console.error(`An error occurred while retriving the chart`);
+      // console.error(`An error occurred while retriving the chart`);
     }
   };
   useEffect(() => {
@@ -258,9 +250,8 @@ console.log(data);
   if(modifiedQuery === ''){
     modifiedQuery=query;
   }
-// console.log("modifiedQuery",modifiedQuery);
 
-const deleteChart = async (sliceId: any) => {
+const deleteChart = async (sliceId: any, dispatch: any) => {
   const slice_ID = parseInt(sliceId)
   try {
     const response = await fetch(`${CHART_BASE_URL}/charts/delete/${slice_ID}`, {
@@ -274,86 +265,148 @@ const deleteChart = async (sliceId: any) => {
 
     if (response.ok) {
       handleCloseModal()
-      console.log(data); 
+      // console.log(data); 
+      dispatch(addSuccessToast(t(`Chart [${name}] has been deleted successfully.`)));
+
     } else {
-      console.error(`Failed to delete chart`);
+      // console.error(`Failed to delete chart`);
+      dispatch(addDangerToast(t('Failed to delete chart')));
     }
   } catch (error) {
-    console.error(`An error occurred while deleting the chart`);
+    // console.error(`An error occurred while deleting the chart`);
+    dispatch(addDangerToast(t('An error occured while deleting chart')));
   }
 };
 
-const saveChart = async (sliceId: string | number) => {
+// const saveChart = async (sliceId: string | number) => {
+//   const updateData = {
+//     name: name,
+//     query: result,
+//     description: description,
+//     type: getType(charts?.explore?.form_data?.viz_type) || 'line',
+//     configuration: configuration,
+//     slice_id: sliceId,
+//   };
+//   if (name?.length < 4 || name?.length > 40) {
+//     setCheckName(true); 
+//     console.error('Chart name must be between 4 and 40 characters long.');
+//     return;
+//   } else {
+//     setCheckName(false);
+//   }
+//   if (description?.length < 4) {
+//     setCheckDescription(true);
+//     console.error('Description length must be more than 4 characters.');
+//     return;
+//   }else {
+//     setCheckDescription(false)
+//   }
+//   if(result === undefined){
+//     setCheckQuery(true);
+//     console.error('Query is required');
+//     return;
+//   }else {
+//     setCheckQuery(false);
+//   }
+//   if(sliceId !== 0){
+//   try {
+//     const response = await fetch(`${CHART_BASE_URL}/charts/update/${sliceId}`, {
+//       method: 'PUT',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(updateData),
+//     });
+
+//     const data = await response.json();
+//     if (response.ok) {
+//       handleCloseModal()
+//       addSuccessToast(t('Chart has been saved successfully'))
+//       // console.log(data);
+//     } else {
+//       setCheckDescription(true)
+//       console.error('Description length must be more than 4 characters.');
+//     }
+//   } 
+//   catch (error) {
+//     console.error('An error occurred while updating the chart');
+//   }
+// }else {
+//   console.error("First save the chart to generate slice id")
+// }
+// };
+
+const saveChart = async (sliceId: string | number, dispatch: any) => {
   const updateData = {
     name: name,
     query: result,
     description: description,
-    type: getType(charts?.explore?.form_data?.viz_type) || 'line',
+    type: getType(charts?.explore?.form_data?.viz_type) ,
     configuration: configuration,
     slice_id: sliceId,
   };
+
   if (name?.length < 4 || name?.length > 40) {
-    setCheckName(true); 
-    console.error('Chart name must be between 4 and 40 characters long.');
+    setCheckName(true);
+    dispatch(addDangerToast(t('Chart name must be between 4 and 40 characters long.')));
     return;
   } else {
     setCheckName(false);
   }
+
   if (description?.length < 4) {
     setCheckDescription(true);
-    console.error('Description length must be more than 4 characters.');
+    dispatch(addDangerToast(t('Description length must be more than 4 characters.')));
     return;
-  }else {
-    setCheckDescription(false)
+  } else {
+    setCheckDescription(false);
   }
-  if(result === undefined){
+
+  if (result === undefined) {
     setCheckQuery(true);
-    console.error('Query is required');
+    dispatch(addDangerToast(t('Query is required.')));
     return;
-  }else {
+  } else {
     setCheckQuery(false);
   }
-  if(sliceId !== 0){
-  try {
-    const response = await fetch(`${CHART_BASE_URL}/charts/update/${sliceId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updateData),
-    });
 
-    const data = await response.json();
-    if (response.ok) {
-      handleCloseModal()
-      addSuccessToast(t('Chart has been saved successfully'))
-      console.log(data);
-    } else {
-      setCheckDescription(true)
-      console.error('Description length must be more than 4 characters.');
+  if (sliceId !== 0) {
+    try {
+      const response = await fetch(`${CHART_BASE_URL}/charts/update/${sliceId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        handleCloseModal();
+        dispatch(addSuccessToast(t(`Chart [${name}] has been saved successfully.`)));
+      } else {
+        setCheckDescription(true);
+        dispatch(addDangerToast(t('Failed to save the chart. Please try again.')));
+      }
+    } catch (error) {
+      dispatch(addDangerToast(t('An error occurred while updating the chart.')));
     }
-  } 
-  catch (error) {
-    console.error('An error occurred while updating the chart');
+  } else {
+    dispatch(addDangerToast(t('First save the chart to generate a slice ID.')));
   }
-}else {
-  console.error("First save the chart to generate slice id")
-}
 };
 
-// console.log(modifiedQuery,"new query");
 
-  console.log(checkName)
   const renderFooter = () => (
     <div data-test="save-modal-footer">
       <Button className='delete_chart'
-      onClick={()=>deleteChart(sliceId)}
+      onClick={()=>deleteChart(sliceId,dispatch)}
       buttonStyle="danger"
       >
         {t('Delete')}
       </Button> 
        <Button className='update_chart'
-        onClick={()=>saveChart(sliceId)}
+        onClick={()=>saveChart(sliceId,dispatch)}
         data-test="btn-modal-save"
       buttonStyle="primary"
       >

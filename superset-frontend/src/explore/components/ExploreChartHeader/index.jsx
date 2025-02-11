@@ -282,7 +282,7 @@ export const ExploreChartHeader = ({
                       openModal();
                       showAllChartModal();
                     }}
-                    disabled={publishDisabled}
+                    disabled={saveDisabled}
                     data-test="query-save-button"
                     css={saveButtonStyles}
                   >

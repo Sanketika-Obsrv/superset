@@ -81,10 +81,10 @@ useEffect(()=>{
 
 
   useEffect(()=> {
-    if(dbMetrics?.length !== metrics?.length 
-      || dbDimensions?.length!== dimensions.length 
-      || dbFilters?.length !== filters.length 
-      || dbX_axis?.length !== x_axis.length
+    if(dbMetrics?.length !== metrics?.length || JSON.stringify(dbMetrics) !== JSON.stringify(metrics)
+      || dbDimensions?.length!== dimensions.length || JSON.stringify(dbDimensions) !== JSON.stringify(dimensions)
+      || dbFilters?.length !== filters.length || JSON.stringify(dbFilters) !== JSON.stringify(filters)
+      || dbX_axis?.length !== x_axis.length 
     ){
       setCheckData(false)
     }else {
@@ -116,8 +116,7 @@ if(filters?.length > 0){
   configuration.filters = filters
 }
 
-  console.log({props});
-  console.log({charts});  
+
   
   return (
     <Form data-test="save-modal-body" layout="vertical">
@@ -164,7 +163,7 @@ if(filters?.length > 0){
             </div>
           </div>
         )}
-    </>  } else {
+    </>  }  { !checkData && 
       <> 
       {x_axis && (
         <div className="section">

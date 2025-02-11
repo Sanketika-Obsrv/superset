@@ -229,17 +229,8 @@ if (metrics.includes("count")) {
     }
   }, [dimensionLabels, filterLabels, metricLabels, x_axis]);
 
-  // console.log(newMet?.every((value: any, index: number) => value === metricLabels[index]),"metric check");
-  // console.log(newDim?.every((value: any, index: number) => value === dimensionLabels[index]),"dimensions check");
-  // console.log(newFil?.every((value: any, index: number) => value === filterLabels[index]),"filter check");
-  // console.log(newX === x_axis,"x axis check");
-  
 
   
-  
-console.log(newMet,"newMet");
-console.log(metricLabels,"metricLabels");
-
 
 
   const columns = controls.adhoc_filters.columns;
@@ -251,7 +242,7 @@ console.log(metricLabels,"metricLabels");
     <Form data-test="save-modal-body" layout="vertical">
     <div className="container-chart">
       { !checkData && 
-      <>  from redux
+      <>  
     {metricLabels?.length > 0 && (
           <div className="section">
             <div className="column-label">Metrics:</div> 
@@ -295,7 +286,7 @@ console.log(metricLabels,"metricLabels");
           </div>
           )} 
         </>
-        } { checkData && <> from db
+        } { checkData && <> 
         {newX && (
           <div className="section">
             <div className="column-label">X-Axis</div> 
