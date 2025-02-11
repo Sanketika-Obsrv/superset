@@ -41,7 +41,6 @@ const metadata = new ChartMetadata({
   thumbnail,
   useLegacyApi: true,
 });
-
 export default class TimeTableChartPlugin extends ChartPlugin {
   constructor() {
     super({

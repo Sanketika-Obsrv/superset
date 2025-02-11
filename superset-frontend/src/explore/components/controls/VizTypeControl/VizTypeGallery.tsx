@@ -47,6 +47,7 @@ import { usePluginContext } from 'src/components/DynamicPlugins';
 import Icons from 'src/components/Icons';
 import { nativeFilterGate } from 'src/dashboard/components/nativeFilters/utils';
 import scrollIntoView from 'scroll-into-view-if-needed';
+import { props } from 'lodash/fp';
 
 interface VizTypeGalleryProps {
   onChange: (vizType: string | null) => void;
@@ -54,6 +55,7 @@ interface VizTypeGalleryProps {
   selectedViz: string | null;
   className?: string;
   denyList: string[];
+  columnEntries?:any;
 }
 
 type VizEntry = {
@@ -71,6 +73,9 @@ enum Sections {
 const THUMBNAIL_GRID_UNITS = 24;
 
 export const MAX_ADVISABLE_VIZ_GALLERY_WIDTH = 1090;
+
+// console.log("top",ChartMetadata);
+
 
 const OTHER_CATEGORY = t('Other');
 
@@ -326,11 +331,13 @@ interface ThumbnailProps {
   selectedViz: string | null;
   setSelectedViz: (viz: string) => void;
   onDoubleClick: () => void;
+  columnEntries:any;
 }
 
 const Thumbnail: FC<ThumbnailProps> = ({
   entry,
   selectedViz,
+  columnEntries,
   setSelectedViz,
   onDoubleClick,
 }) => {
@@ -378,19 +385,30 @@ interface ThumbnailGalleryProps {
   selectedViz: string | null;
   setSelectedViz: (viz: string) => void;
   onDoubleClick: () => void;
+  columnEntries:any;
 }
-
 /** A list of viz thumbnails, used within the viz picker modal */
-const ThumbnailGallery: FC<ThumbnailGalleryProps> = ({
+export const ThumbnailGallery: FC<ThumbnailGalleryProps> = ({
   vizEntries,
+  columnEntries,
   ...props
-}) => (
-  <IconsPane data-test={`${VIZ_TYPE_CONTROL_TEST_ID}__viz-row`}>
-    {vizEntries.map(entry => (
-      <Thumbnail key={entry.key} {...props} entry={entry} />
-    ))}
-  </IconsPane>
-);
+}) => {
+  // console.log(vizEntries);
+  // columnEntries=vizEntries;
+  // COLUMN_ENTRIES = columnEntries;
+  // // console.log(COLUMN_ENTRIES)
+  
+  return (
+    <IconsPane data-test={`${VIZ_TYPE_CONTROL_TEST_ID}__viz-row`}>
+      {vizEntries.map(entry => (
+        <Thumbnail columnEntries={entry} key={entry.key} {...props} entry={entry} />
+      ))}
+    </IconsPane>
+  );
+};
+// export let COL_ENTRY = COLUMN_ENTRIES;
+// console.log("Viz",COL_ENTRY); 
+
 
 const Selector: FC<{
   selector: string;
@@ -436,18 +454,24 @@ const doesVizMatchSelector = (viz: ChartMetadata, selector: string) =>
   (viz.tags || []).indexOf(selector) > -1;
 
 export default function VizTypeGallery(props: VizTypeGalleryProps) {
-  const { selectedViz, onChange, onDoubleClick, className, denyList } = props;
+  let { selectedViz, onChange, onDoubleClick, className, denyList,columnEntries } = props;
   const { mountedPluginMetadata } = usePluginContext();
   const searchInputRef = useRef<HTMLInputElement>();
   const [searchInputValue, setSearchInputValue] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(true);
   const isActivelySearching = isSearchFocused && !!searchInputValue;
 
+  // console.log(mountedPluginMetadata);
+  
+  columnEntries=mountedPluginMetadata;
+
+
   const selectedVizMetadata: ChartMetadata | null = selectedViz
     ? mountedPluginMetadata[selectedViz]
     : null;
+    // console.log("Chart",{mountedPluginMetadata});
 
-  const chartMetadata: VizEntry[] = useMemo(() => {
+    const chartMetadata: VizEntry[] = useMemo(() => {
     const result = Object.entries(mountedPluginMetadata)
       .map(([key, value]) => ({ key, value }))
       .filter(({ key }) => !denyList.includes(key))
@@ -513,6 +537,9 @@ export default function VizTypeGallery(props: VizTypeGalleryProps) {
       chartMetadata.sort((a, b) => a.value.name.localeCompare(b.value.name)),
     [chartMetadata],
   );
+  // console.log(sortedMetadata);
+  // console.log("chartMetadata",chartMetadata);
+  
 
   const [activeSelector, setActiveSelector] = useState<string>(
     () => selectedVizMetadata?.category || FEATURED,
@@ -652,10 +679,13 @@ export default function VizTypeGallery(props: VizTypeGalleryProps) {
   };
 
   return (
+    
     <VizPickerLayout
       className={className}
       isSelectedVizMetadata={Boolean(selectedVizMetadata)}
     >
+{/* console.log(vizEntries) */}
+
       <LeftPane>
         <Selector
           css={({ gridUnit }) =>
@@ -758,7 +788,6 @@ export default function VizTypeGallery(props: VizTypeGalleryProps) {
           onDoubleClick={onDoubleClick}
         />
       </RightPane>
-
       {selectedVizMetadata ? (
         <div
           css={(theme: SupersetTheme) => [

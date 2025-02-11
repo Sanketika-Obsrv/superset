@@ -43,7 +43,7 @@ const ViewQueryModalContainer = styled.div`
   flex-direction: column;
 `;
 
-const ViewQueryModal: FC<Props> = props => {
+const ViewQueryModal: FC<Props> = (props:any) => {
   const [result, setResult] = useState<Result[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

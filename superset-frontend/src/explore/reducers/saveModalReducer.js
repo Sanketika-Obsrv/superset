@@ -45,6 +45,7 @@ export default function saveModalReducer(state = {}, action) {
     },
   };
 
+
   if (action.type in actionHandlers) {
     return actionHandlers[action.type]();
   }

@@ -269,6 +269,8 @@ export enum MenuKeys {
   CopyLink = 'copy_link',
   Download = 'download',
   SaveModal = 'save_modal',
+  SaveChart = 'save_chart',
+  AllChart = 'all_chart',
   RefreshDashboard = 'refresh_dashboard',
   AutorefreshModal = 'autorefresh_modal',
   SetFilterMapping = 'set_filter_mapping',

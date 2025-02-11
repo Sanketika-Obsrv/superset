@@ -36,6 +36,8 @@ import sliceEntities from 'src/dashboard/reducers/sliceEntities';
 import dashboardLayout from 'src/dashboard/reducers/undoableDashboardLayout';
 import logger from 'src/middleware/loggerMiddleware';
 import saveModal from 'src/explore/reducers/saveModalReducer';
+import saveChart from 'src/explore/reducers/saveChartReducer';
+import AllChart from 'src/explore/reducers/allChartReducer';
 import explore from 'src/explore/reducers/exploreReducer';
 import exploreDatasources from 'src/explore/reducers/datasourcesReducer';
 
@@ -138,6 +140,8 @@ const reducers = {
   sliceEntities,
   reports,
   saveModal,
+  saveChart,
+  AllChart,
   explore,
 };
 
