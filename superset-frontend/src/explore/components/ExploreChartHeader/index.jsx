@@ -36,7 +36,7 @@ import { useExploreAdditionalActionsMenu } from '../useExploreAdditionalActionsM
 import { useExploreMetadataBar } from './useExploreMetadataBar';
 import saveChart from '../saveChart';
 import AllChart from '../AllChart';
-
+import "./style.css";
 const propTypes = {
   actions: PropTypes.object.isRequired,
   canOverwrite: PropTypes.bool.isRequired,
@@ -185,7 +185,16 @@ export const ExploreChartHeader = ({
     );
 
   const metadataBar = useExploreMetadataBar(metadata, slice);
-
+  const params = new URLSearchParams(window.location.search);
+  const sliceId = params?.get('slice_id') || 0;
+  const [isShown, setIsShown] = useState(false);
+  const [publishDisabled,setPublishDisabled] = useState(true);
+  useEffect(()=>{
+    if(sliceId !== 0){
+      setPublishDisabled(false);
+    }
+  },[sliceId])
+  
   const oldSliceName = slice?.slice_name;
   return (
     <>
@@ -229,6 +238,7 @@ export const ExploreChartHeader = ({
           </div>
         }
         rightPanelAdditionalItems={
+          <>
           <Tooltip
             title={
               saveDisabled
@@ -248,7 +258,9 @@ export const ExploreChartHeader = ({
                 <Icons.SaveOutlined iconSize="l" />
                 {t('Save')}
               </Button>
-              <Button
+              </div>
+          </Tooltip>
+              {/* <Button
                 buttonStyle="secondary"
                 onClick={newShowModal}
                 disabled={saveDisabled}
@@ -257,27 +269,33 @@ export const ExploreChartHeader = ({
               >
                 <Icons.SaveOutlined iconSize="l" />
                 {t('Create new Chart')}
-              </Button>
-              <Button
-                buttonStyle="secondary"
-                onClick={
-                  ()=>{
-                    openModal();
-                    showAllChartModal();
-                    <AllChart isModalOpen={isModalOpen} setModalOpen={setModalOpen} 
-                    />
-                  }
-                }
-                disabled={saveDisabled}
-                data-test="query-save-button"
-                css={saveButtonStyles}
-              >
-                <Icons.SaveOutlined iconSize="l" />
-                {t('Create All Chart')}
-              </Button>
-            </div>
-          </Tooltip>
+              </Button> */}
+              <Tooltip title={
+                publishDisabled 
+                ? t('First save the chart to publish it.')
+                : null
+              }>
+                <span className='publish-span' >
+                  <Button
+                    buttonStyle="secondary"
+                    onClick={() => {
+                      openModal();
+                      showAllChartModal();
+                    }}
+                    disabled={publishDisabled}
+                    data-test="query-save-button"
+                    css={saveButtonStyles}
+                  >
+                    <Icons.SaveOutlined iconSize="l" />
+                    {t('Publish Chart')}
+                  </Button>
+                  </span>
+              </Tooltip>
+
+            
+          </>
         }
+        
         additionalActionsMenu={menu}
         menuDropdownProps={{
           visible: isDropdownVisible,

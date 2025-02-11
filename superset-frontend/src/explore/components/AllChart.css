@@ -1,0 +1,19 @@
+.update_chart{
+    /* background-color: rgb(36, 228, 228); */
+    width: 100px;
+    border-radius: 5px;
+    margin-left: 5px;
+    height: 32px;
+    /* border-color: rgb(36, 228, 228); */
+    border:none;
+}
+.delete_chart{
+    /* background-color: rgb(245, 96, 96); */
+    color: white;
+    height: 32px;
+    margin-left: 350px;
+    width: 100px;
+    border-radius: 5px;
+    /* border-color: rgb(245, 96, 96); */
+    border:none;
+}

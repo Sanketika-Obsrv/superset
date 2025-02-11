@@ -197,7 +197,8 @@ export function newQuery(query: string, filters: any[]): string {
     
     const match = comparator.match(/DATEADD\(DATETIME\("now"\), (\d+), (\w+)\)/);
     if (!match) {
-      throw new Error("Invalid comparator format for DATEADD");
+      // throw new Error("Invalid comparator format for DATEADD");
+      return ""
     }
   
     const value = parseInt(match[1], 10);
@@ -216,7 +217,8 @@ export function newQuery(query: string, filters: any[]): string {
   
     const sqlOperation = operationMap[operation];
     if (!sqlOperation) {
-      throw new Error(`Unsupported operation: ${operation}`);
+      // throw new Error(`Unsupported operation: ${operation}`);
+      return ""
     }
 
     return `${filter.subject} >= TIMESTAMPADD(HOUR, ${0}, CURRENT_TIMESTAMP) AND ${filter.subject} <= TIMESTAMPADD(${sqlOperation}, ${value}, CURRENT_TIMESTAMP)`;
@@ -227,7 +229,8 @@ export function newQuery(query: string, filters: any[]): string {
   
     const match = comparator.match(/now : (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})/);
     if (!match) {
-      throw new Error("Invalid comparator format for specific date-time");
+      // throw new Error("Invalid comparator format for specific date-time");
+      return ""
     }
   
     const dateTime = match[1];
@@ -249,7 +252,8 @@ export function newQuery(query: string, filters: any[]): string {
     
     const match = comparator.match(/DATEADD\(DATETIME\("today"\), (\d+), (\w+)\)/);
     if (!match) {
-      throw new Error("Invalid comparator format for DATEADD");
+      // throw new Error("Invalid comparator format for DATEADD");
+      return ""
     }
   
     const value = parseInt(match[1], 10);
@@ -268,7 +272,8 @@ export function newQuery(query: string, filters: any[]): string {
   
     const sqlOperation = operationMap[operation];
     if (!sqlOperation) {
-      throw new Error(`Unsupported operation: ${operation}`);
+      // throw new Error(`Unsupported operation: ${operation}`);
+      return ""
     }
 
     return `${filter.subject} >= TIMESTAMPADD(HOUR, ${-hours}, CURRENT_TIMESTAMP) AND ${filter.subject} <= TIMESTAMPADD(${sqlOperation}, ${value}, CURRENT_TIMESTAMP)`;
@@ -278,7 +283,8 @@ export function newQuery(query: string, filters: any[]): string {
     const comparator = filter.comparator;
     const match = comparator.match(/today : (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})/);
     if (!match) {
-      throw new Error("Invalid comparator format for specific date-time");
+      // throw new Error("Invalid comparator format for specific date-time");
+      return ""
     }
   
     const dateTime = match[1];
@@ -293,7 +299,8 @@ export function newQuery(query: string, filters: any[]): string {
     const match = comparator.match(/DATEADD\(DATETIME\("now"\), (-?\d+), (\w+)\)/);
   
     if (!match) {
-      throw new Error("Invalid comparator format for DATEADD");
+      // throw new Error("Invalid comparator format for DATEADD");
+      return ""
     }
   
     const value = parseInt(match[1], 10); 
@@ -311,7 +318,8 @@ export function newQuery(query: string, filters: any[]): string {
     };
   
     if (!unitMap[unit]) {
-      throw new Error(`Unsupported time unit: ${unit}`);
+      // throw new Error(`Unsupported time unit: ${unit}`);
+      return ""
     }
   
     return `${filter.subject} >= TIMESTAMPADD(${unitMap[unit]}, ${value}, CURRENT_TIMESTAMP) AND ${filter.subject} < TIMESTAMPADD(SECOND, ${0}, CURRENT_TIMESTAMP)`;
@@ -323,7 +331,8 @@ export function newQuery(query: string, filters: any[]): string {
     const match = comparator.match(/DATEADD\(DATETIME\("today"\), (-?\d+), (\w+)\)/);
   
     if (!match) {
-      throw new Error("Invalid comparator format for DATEADD");
+      // throw new Error("Invalid comparator format for DATEADD");
+      return ""
     }
   
     const value = parseInt(match[1], 10); 
@@ -341,7 +350,8 @@ export function newQuery(query: string, filters: any[]): string {
     };
   
     if (!unitMap[unit]) {
-      throw new Error(`Unsupported time unit: ${unit}`);
+      // throw new Error(`Unsupported time unit: ${unit}`);
+      return ""
     }
   
     return `${filter.subject} >= TIMESTAMPADD(${unitMap[unit]}, ${value}, CURRENT_TIMESTAMP) AND ${filter.subject} < TIMESTAMPADD(HOUR, ${-hours}, CURRENT_TIMESTAMP)`;
@@ -373,10 +383,12 @@ export function newQuery(query: string, filters: any[]): string {
       if (unitMap[unit1] && unitMap[unit2]) {
         return `${filter.subject} >= TIMESTAMPADD(${unitMap[unit1]}, ${value1}, CURRENT_TIMESTAMP) AND ${filter.subject} < TIMESTAMPADD(${unitMap[unit2]}, ${value2}, CURRENT_TIMESTAMP)`;
       } else {
-        throw new Error("Invalid unit in DATEADD expression");
+        // throw new Error("Invalid unit in DATEADD expression");
+      return ""
       }
     } else {
-      throw new Error("Invalid DATEADD expressions in comparator");
+      // throw new Error("Invalid DATEADD expressions in comparator");
+      return ""
     }
   };
 
@@ -384,7 +396,8 @@ export function newQuery(query: string, filters: any[]): string {
     const comparator = filter.comparator;
     const match = comparator.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})/);
     if (!match) {
-      throw new Error("Invalid comparator format for specific date-time");
+      // throw new Error("Invalid comparator format for specific date-time");
+      return ""
     }
   
     const dateTime = match[1];
@@ -392,7 +405,8 @@ export function newQuery(query: string, filters: any[]): string {
   
     const match1 = comparator.match(/DATEADD\(DATETIME\("([^"]+)"\), (-?\d+), (\w+)\)/);
     if (!match1) {
-      throw new Error("Invalid comparator format for DATEADD");
+      // throw new Error("Invalid comparator format for DATEADD");
+      return ""
     }
   
     const value = parseInt(match1[2], 10); 
@@ -409,7 +423,8 @@ export function newQuery(query: string, filters: any[]): string {
     };
   
     if (!unitMap[unit]) {
-      throw new Error(`Unsupported time unit: ${unit}`);
+      // throw new Error(`Unsupported time unit: ${unit}`);
+      return ""
     }
   
     return `${filter.subject} >= TIMESTAMPADD(${unitMap[unit]}, ${value}, TIMESTAMP '${sqlDateTime}') AND ${filter.subject} < TIMESTAMP '${sqlDateTime}'`;
@@ -421,7 +436,8 @@ export function newQuery(query: string, filters: any[]): string {
 
     const match = comparator.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})/);
     if (!match) {
-      throw new Error("Invalid comparator format for specific date-time");
+      // throw new Error("Invalid comparator format for specific date-time");
+      return ""
     }
     
     const dateTime = match[1];
@@ -436,7 +452,8 @@ export function newQuery(query: string, filters: any[]): string {
 
     const match = comparator.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})/);
     if (!match) {
-      throw new Error("Invalid comparator format for specific date-time");
+      // throw new Error("Invalid comparator format for specific date-time");
+      return ""
     }
     
     const dateTime = match[1];
@@ -451,14 +468,16 @@ export function newQuery(query: string, filters: any[]): string {
 
     const match = comparator.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})/);
     if (!match) {
-        throw new Error("Invalid comparator format for specific date-time");
+        // throw new Error("Invalid comparator format for specific date-time");
+      return ""
     }
     const dateTime = match[1]; 
     const sqlDateTime = dateTime.replace("T", " "); 
 
     const match1 = comparator.match(/DATEADD\(DATETIME\("([^"]+)"\), (-?\d+), (\w+)\)/);
     if (!match1) {
-        throw new Error("Invalid comparator format for DATEADD");
+        // throw new Error("Invalid comparator format for DATEADD");
+      return ""
     }
 
     const value = parseInt(match1[2], 10); 
@@ -475,7 +494,8 @@ export function newQuery(query: string, filters: any[]): string {
     };
 
     if (!unitMap[unit]) {
-        throw new Error(`Unsupported time unit: ${unit}`);
+        // throw new Error(`Unsupported time unit: ${unit}`);
+      return ""
     }
 
     return `${filter.subject} >= TIMESTAMP '${sqlDateTime}' 
@@ -493,7 +513,8 @@ const specificToSpecificComparatorFn = (filter: any): string => {
 
       return `${filter.subject} >= TIMESTAMP '${startTimestamp}' AND ${filter.subject} < TIMESTAMP '${endTimestamp}'`;
   } else {
-      throw new Error("Invalid comparator format for specific timestamps");
+      // throw new Error("Invalid comparator format for specific timestamps");
+      return ""
   }
 };
 
@@ -582,14 +603,21 @@ const specificToSpecificComparatorFn = (filter: any): string => {
     const timeRangeFilters = filters.filter(
       (filter) => filter.operator === "TEMPORAL_RANGE"
     );
-
+    
     const otherFilters = filters.filter((filter) => filter.operator !== "TEMPORAL_RANGE");
 
+    
     const otherClauses = otherFilters.map((filter) => {
       const subject = filter.subject;
       const operator = filter.operator;
       const comparator = filter.comparator;
-    
+      const expressionType = filter.expressionType;
+      const clause = filter.clause;
+      const sqlExpression = filter.sqlExpression;
+      if(expressionType === "SQL" && clause === "WHERE"){
+        return `${sqlExpression}`
+      }
+
       switch (operator) {
         case "IN":
         case "NOT IN": {
@@ -621,15 +649,19 @@ const specificToSpecificComparatorFn = (filter: any): string => {
           return `${subject} ${operator}`;
     
         default:
-          throw new Error(`Unsupported filter operator: ${operator}`);
+          // throw new Error(`Unsupported filter operator: ${operator}`);
+      return ""
       }
     });
+    
     
     const filterClauses = timeRangeFilters.map(generateWhereClause);
     const validClauses = filterClauses.filter((clause) => clause.trim() !== "");
     const allClauses = [...validClauses, ...otherClauses];
-    return allClauses.length > 0 ? `WHERE ${allClauses.join(" AND ")}` : "";
-  
+
+    const filteredClauses = allClauses.filter(clause => clause.trim() !== ""); 
+    
+    return filteredClauses.length > 0 ? `WHERE ${filteredClauses.join(" AND ")}` : "";
   }
   return processTemporalRangeFilters(filters); 
 }

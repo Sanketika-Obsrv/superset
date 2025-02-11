@@ -22,13 +22,10 @@ from typing import Optional
 from flask import Flask
 
 from superset.initialization import SupersetAppInitializer
-from superset.initialization.api import API
+from superset.initialization.api import ChartAPI
 
 logger = logging.getLogger(__name__)
 
-from flask_wtf.csrf import CSRFProtect
-
-csrf = CSRFProtect()
 
 def create_app(superset_config_module: Optional[str] = None) -> Flask:
     app = SupersetApp(__name__)
@@ -43,11 +40,12 @@ def create_app(superset_config_module: Optional[str] = None) -> Flask:
         app_initializer = app.config.get("APP_INITIALIZER", SupersetAppInitializer)(app)
         app_initializer.init_app()
 
-        csrf.init_app(app)
-        csrf.exempt("/charts")
+        # app.add_url_rule('/charts', 'create_chart', ChartAPI.create_chart, methods=["POST"])
+        app.add_url_rule('/charts/update/<slice_id>', 'save_chart', ChartAPI.save_chart, methods=["PUT"])
+        app.add_url_rule('/charts/delete/<slice_id>', 'delete_chart', ChartAPI.delete_chart, methods=["DELETE"])
+        app.add_url_rule('/charts/search/<slice_id>', 'get_chart', ChartAPI.get_chart, methods=["GET"])
 
-        app.add_url_rule('/charts', 'create_chart', API.create_chart, methods=["POST"])
-        app.add_url_rule('/charts', 'get_charts', API.get_charts, methods=["GET"])
+        
         return app
 
     # Make sure that bootstrap errors ALWAYS get logged
