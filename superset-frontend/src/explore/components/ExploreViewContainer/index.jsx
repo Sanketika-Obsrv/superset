@@ -187,6 +187,7 @@ const updateHistory = debounce(
       additionalParam[URL_PARAMS.datasourceId.name] = datasourceId;
       additionalParam[URL_PARAMS.datasourceType.name] = datasourceType;
     }
+    const [disablePublish,setDisablePublish] = useState(false);
 
     const urlParams = payload?.url_params || {};
     Object.entries(urlParams).forEach(([key, value]) => {
@@ -493,7 +494,6 @@ function ExploreViewContainer(props) {
     }
     return false;
   }, [lastQueriedControls, props.controls]);
-
   useChangeEffect(props.saveAction, () => {
     if (['saveas', 'overwrite'].includes(props.saveAction)) {
       onQuery();
@@ -502,6 +502,8 @@ function ExploreViewContainer(props) {
     }
   });
 
+  // useEffect(()=>{
+  // },[chartIsStale])
   useEffect(() => {
     if (props.ownState !== undefined) {
       onQuery();
@@ -582,6 +584,7 @@ function ExploreViewContainer(props) {
         reports={props.reports}
         saveDisabled={errorMessage || props.chart.chartStatus === 'loading'}
         metadata={props.metadata}
+        chartIsStale={chartIsStale}
       />
       <ExplorePanelContainer id="explore-container">
         <Global
@@ -734,6 +737,7 @@ function ExploreViewContainer(props) {
           sliceName={props.sliceName}
           dashboardId={props.dashboardId}
           chart={props.chart}
+          chartIsStale={chartIsStale}
         />
       )}
       

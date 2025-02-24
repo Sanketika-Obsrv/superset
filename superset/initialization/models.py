@@ -7,17 +7,12 @@ import uuid
 
 Base = declarative_base()
 
-class ChartType(PyEnum):
-    BAR = "bar"
-    LINE = "line"
 
 class Charts(Base):
-    __tablename__ = "charts"
+    __tablename__ = "report_config"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = Column(String(255), nullable=False)
     description = Column(Text, nullable=False)
-    type = Column(Enum(ChartType), nullable=False)
     query = Column(Text, nullable=False)
     configuration = Column(JSON, nullable=False)
     slice_id = Column(Integer, nullable=False)

@@ -42,7 +42,7 @@ def create_app(superset_config_module: Optional[str] = None) -> Flask:
 
         # app.add_url_rule('/charts', 'create_chart', ChartAPI.create_chart, methods=["POST"])
         app.add_url_rule('/charts/update/<slice_id>', 'save_chart', ChartAPI.save_chart, methods=["PUT"])
-        app.add_url_rule('/charts/delete/<slice_id>', 'delete_chart', ChartAPI.delete_chart, methods=["DELETE"])
+        # app.add_url_rule('/charts/delete/<slice_id>', 'delete_chart', ChartAPI.delete_chart, methods=["DELETE"])
         app.add_url_rule('/charts/search/<slice_id>', 'get_chart', ChartAPI.get_chart, methods=["GET"])
 
         

@@ -19,6 +19,7 @@
 import  React, {useCallback, useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { store } from 'src/views/store';
 import PropTypes from 'prop-types';
 import { Tooltip } from 'src/components/Tooltip';
 import { css, logging, SupersetClient, t } from '@superset-ui/core';
@@ -87,11 +88,14 @@ export const ExploreChartHeader = ({
   sliceName,
   saveDisabled,
   metadata,
+  chartIsStale,
 }) => {
   const dispatch = useDispatch();
   const { latestQueryFormData, sliceFormData } = chart;
   const [isPropertiesModalOpen, setIsPropertiesModalOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
+  const charts = store.getState();
+  const [checkDiff,setCheckDiff] = useState(charts?.checkDiff?.value);
   const updateCategoricalNamespace = async () => {
     const { dashboards } = metadata || {};
     const dashboard =
@@ -122,9 +126,7 @@ export const ExploreChartHeader = ({
     }
   };
 
-  // console.log(sliceName);
   
-
 
   useEffect(() => {
     updateCategoricalNamespace();
@@ -189,11 +191,14 @@ export const ExploreChartHeader = ({
   const sliceId = params?.get('slice_id') || 0;
   const [isShown, setIsShown] = useState(false);
   const [publishDisabled,setPublishDisabled] = useState(true);
+
   useEffect(()=>{
     if(sliceId !== 0){
       setPublishDisabled(false);
     }
-  },[sliceId])
+    setPublishDisabled(charts?.checkDiff?.value)
+
+  },[sliceId,charts?.checkDiff?.value])
   
   const oldSliceName = slice?.slice_name;
   return (
@@ -262,7 +267,10 @@ export const ExploreChartHeader = ({
           </Tooltip>
               {/* <Button
                 buttonStyle="secondary"
-                onClick={newShowModal}
+                onClick={() => {
+                  openModal();
+                  newShowModal();
+                }}                
                 disabled={saveDisabled}
                 data-test="query-save-button"
                 css={saveButtonStyles}
@@ -271,8 +279,8 @@ export const ExploreChartHeader = ({
                 {t('Create new Chart')}
               </Button> */}
               <Tooltip title={
-                publishDisabled 
-                ? t('First save the chart to publish it.')
+                publishDisabled || saveDisabled || chartIsStale || sliceId === 0
+                ? t('Save the chart to publish')
                 : null
               }>
                 <span className='publish-span' >
@@ -282,7 +290,7 @@ export const ExploreChartHeader = ({
                       openModal();
                       showAllChartModal();
                     }}
-                    disabled={saveDisabled}
+                    disabled={publishDisabled || saveDisabled || chartIsStale || sliceId === 0  }
                     data-test="query-save-button"
                     css={saveButtonStyles}
                   >

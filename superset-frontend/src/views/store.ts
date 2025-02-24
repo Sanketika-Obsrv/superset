@@ -19,7 +19,7 @@
 import {
   configureStore,
   ConfigureStoreOptions,
-  StoreEnhancer,
+  StoreEnhancer
 } from '@reduxjs/toolkit';
 import thunk from 'redux-thunk';
 import { api } from 'src/hooks/apiResources/queryApi';
@@ -59,6 +59,8 @@ import { AnyDatasourcesAction } from 'src/explore/actions/datasourcesActions';
 import { HydrateExplore } from 'src/explore/actions/hydrateExplore';
 import getBootstrapData from 'src/utils/getBootstrapData';
 import { Dataset } from '@superset-ui/chart-controls';
+import checkDiffReducer from 'src/reducer/checkDiffSlice';
+
 
 // Some reducers don't do anything, and redux is just used to reference the initial "state".
 // This may change later, as the client application takes on more responsibilities.
@@ -85,6 +87,7 @@ export const userReducer = (
   }
   return user;
 };
+
 
 const getMiddleware: ConfigureStoreOptions['middleware'] =
   getDefaultMiddleware =>
@@ -143,6 +146,7 @@ const reducers = {
   saveChart,
   AllChart,
   explore,
+  checkDiff: checkDiffReducer,
 };
 
 /* In some cases the jinja template injects two separate React apps into basic.html

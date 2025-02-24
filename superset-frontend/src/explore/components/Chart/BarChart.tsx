@@ -8,22 +8,32 @@ const BarChart = (props:any) => {
 
 const charts = store.getState();
 const data = props.dbData;
-const [x_axis,setX_Axis] = useState(props.dbData.responseCode === "OK" ? props.dbData?.result?.configuration?.x_axis : undefined);
+
 const [metrics,setMetrics] = useState(charts.explore.form_data.metrics.map((metric:any) =>
   metric.label ? metric.label : "COUNT(*)"
 ));
+
 const [dimensions,setDimensions] = useState(charts.explore.form_data.groupby.map((dimension:any) =>
   typeof dimension === "string" ? dimension : dimension.label));
+
+
 const [getDbData,setGetDbData] = useState(false);
 const [filtersArray,setFiltersArray] = useState(charts.explore.form_data.adhoc_filters);
 const [filters,setFilters] = useState(props.dbData.responseCode === "OK" && props.dbData?.result?.configuration?.filters);
 
-const [dbX_axis,setDbX_axis] = useState(props.dbData.responseCode === "OK" && props.dbData?.result?.configuration?.x_axis);
 const [dbDimensions,setDbDimensions] = useState(props.dbData.responseCode === "OK" && props.dbData?.result?.configuration?.dimensions);
 const [dbMetrics,setDbMetrics] = useState(props.dbData.responseCode === "OK" && props.dbData?.result?.configuration?.metrics);
 const [dbFilters,setDbFilters] = useState(props.dbData.responseCode === "OK" && props.dbData?.result?.configuration?.filters);
 const [checkData,setCheckData] = useState(false);
 
+
+useEffect(()=>{
+  if(typeof charts?.explore?.form_data?.x_axis === "object"){
+    setDimensions([charts?.explore?.form_data?.x_axis.label,...dimensions]);
+  }else {
+    setDimensions([charts?.explore?.form_data?.x_axis,...dimensions])
+  }
+},[])
 
 
 
@@ -60,14 +70,9 @@ useEffect(()=>{
     });
     setFilters(columns.filter((value: any): value is string => value));
   }
-  if(typeof charts?.explore?.form_data?.x_axis === "object"){
-    setX_Axis(charts?.explore?.form_data?.x_axis.label);
-  }else {
-    setX_Axis(charts?.explore?.form_data?.x_axis)
-  }
+
 
   if(data.responseCode === "OK"){
-    setDbX_axis(data.result.configuration.x_axis)
     setDbDimensions(data.result.configuration.dimensions)
     setDbMetrics(data.result.configuration.metrics)
     setDbFilters(data.result.configuration.filters)
@@ -76,15 +81,19 @@ useEffect(()=>{
       setCheckData(false)
     }
 
+  
 
 },[data])
+
+
+
+
 
 
   useEffect(()=> {
     if(dbMetrics?.length !== metrics?.length || JSON.stringify(dbMetrics) !== JSON.stringify(metrics)
       || dbDimensions?.length!== dimensions.length || JSON.stringify(dbDimensions) !== JSON.stringify(dimensions)
       || dbFilters?.length !== filters.length || JSON.stringify(dbFilters) !== JSON.stringify(filters)
-      || dbX_axis?.length !== x_axis.length 
     ){
       setCheckData(false)
     }else {
@@ -93,19 +102,16 @@ useEffect(()=>{
   },[
     dimensions,filters,
     metrics
-    ,x_axis
+    
   ])
 
 const configuration = {
-  x_axis:'',
-  metrics: '' ,
-  dimensions: '',
-  filters: ''
+  metrics: [] ,
+  dimensions: [],
+  filters: []
 };
 
-if(x_axis !== undefined){
-  configuration.x_axis = x_axis;
-}
+
 if(dimensions.length > 0){
   configuration.dimensions = dimensions
 }
@@ -123,16 +129,6 @@ if(filters?.length > 0){
     <div className="container-chart">
        {
       checkData && <> 
-      {dbX_axis &&  (
-        <div className="section">
-          <div className="column-label">X-Axis</div> 
-            <div className='column-set'>
-              <div className='column'>
-                {dbX_axis}
-              </div>
-            </div>
-          </div>
-        )}
       {dbMetrics?.length > 0 && (
         <div className="section">
           <div className="column-label">Metrics</div> 
@@ -165,16 +161,6 @@ if(filters?.length > 0){
         )}
     </>  }  { !checkData && 
       <> 
-      {x_axis && (
-        <div className="section">
-          <div className="column-label">X-Axis</div> 
-            <div className='column-set'>
-              <div className='column'>
-                {x_axis}
-              </div>
-            </div>
-          </div>
-        )}
       {metrics?.length > 0 && (
         <div className="section">
           <div className="column-label">Metrics</div> 

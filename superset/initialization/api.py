@@ -3,7 +3,7 @@ from flask import jsonify, request
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from marshmallow import ValidationError
-from superset.initialization.schemas import ChartCreateSchema, ChartUpdateSchema, ChartDeleteSchema
+from superset.initialization.schemas import ChartCreateSchema, ChartUpdateSchema
 from superset.initialization.models import Charts, Base
 from datetime import datetime
 import os
@@ -122,12 +122,9 @@ class ChartAPI:
                             "result": {}
                         }), 400
 
-                    chart_type = chart_data["type"].upper()
                     new_chart = Charts(
                         id=chart_data.get("id"),
-                        name=chart_data["name"],
                         description=chart_data["description"],
-                        type=chart_type,
                         slice_id=chart_data["slice_id"],
                         query=chart_data.get("query"),
                         configuration=chart_data["configuration"],
@@ -176,12 +173,8 @@ class ChartAPI:
                     }), 500
 
 
-            if "name" in update_data:
-                chart.name = update_data["name"]
             if "description" in update_data:
                 chart.description = update_data["description"]
-            if "type" in update_data:
-                chart.type = update_data["type"].upper() 
             if "query" in update_data:
                 chart.query = update_data["query"]
             if "configuration" in update_data:
@@ -233,7 +226,7 @@ class ChartAPI:
             }), 500
 
 
-    def delete_chart(slice_id):
+    # def delete_chart(slice_id):
         try:
             slice_id = int(slice_id)
             chart = session.query(Charts).filter_by(slice_id=slice_id).first()
@@ -308,9 +301,7 @@ class ChartAPI:
                 "responseCode": "OK",
                 "result": {
                     "id": str(chart.id), 
-                    "name": chart.name,
                     "description": chart.description,
-                    "type": chart.type.value, 
                     "query": chart.query,
                     "configuration": chart.configuration,
                     "slice_id": chart.slice_id,
