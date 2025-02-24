@@ -34,7 +34,7 @@ import { AsyncSelect, Steps } from 'src/components';
 import withToasts from 'src/components/MessageToasts/withToasts';
 
 import VizTypeGallery, {
-  MAX_ADVISABLE_VIZ_GALLERY_WIDTH,
+  MAX_ADVISABLE_VIZ_GALLERY_WIDTH,COLUMN_ENTRIES
 } from 'src/explore/components/controls/VizTypeControl/VizTypeGallery';
 import { findPermission } from 'src/utils/findPermission';
 import { UserWithPermissionsAndRoles } from 'src/types/bootstrapTypes';

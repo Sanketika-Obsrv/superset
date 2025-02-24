@@ -17,7 +17,8 @@
  * under the License.
  */
 import { useCallback, useEffect, useMemo, useState, FC } from 'react';
-
+import { useDispatch } from 'react-redux';
+import { setCheckDiff } from 'src/reducer/checkDiffSlice';
 import { isEqual, isEmpty } from 'lodash';
 import { QueryFormData, styled, t } from '@superset-ui/core';
 import { sanitizeFormData } from 'src/explore/exploreUtils/formData';
@@ -31,7 +32,6 @@ interface AlteredSliceTagProps {
   origFormData: QueryFormData;
   currentFormData: QueryFormData;
 }
-
 export interface ControlMap {
   [key: string]: {
     label?: string;
@@ -157,11 +157,15 @@ export const getRowsFromDiffs = (
     before: formatValueHandler(diff.before, key, controlsMap),
     after: formatValueHandler(diff.after, key, controlsMap),
   }));
+  // export const [checkDiff,setCheckDiff] = useState(false) 
 
 export const isEqualish = (val1: string, val2: string): boolean =>
   isEqual(alterForComparison(val1), alterForComparison(val2));
 
+
 const AlteredSliceTag: FC<AlteredSliceTagProps> = props => {
+  const dispatch = useDispatch();
+
   const [rows, setRows] = useState<RowType[]>([]);
   const [hasDiffs, setHasDiffs] = useState<boolean>(false);
 
@@ -186,6 +190,15 @@ const AlteredSliceTag: FC<AlteredSliceTagProps> = props => {
     });
     return diffs;
   }, [props.currentFormData, props.origFormData]);
+
+
+  useEffect(() => {
+    if (hasDiffs) {
+      dispatch(setCheckDiff(true)); 
+    }else {
+      dispatch(setCheckDiff(false))
+    }
+  }, [hasDiffs, dispatch]);
 
   useEffect(() => {
     const diffs = getDiffs();
@@ -233,6 +246,9 @@ const AlteredSliceTag: FC<AlteredSliceTagProps> = props => {
     ),
     [],
   );
+
+  // console.log(checkDiff,"check");
+
 
   if (!hasDiffs) {
     return null;

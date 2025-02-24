@@ -70,6 +70,9 @@ import SaveModal from '../SaveModal';
 import DataSourcePanel from '../DatasourcePanel';
 import ConnectedExploreChartHeader from '../ExploreChartHeader';
 import ExploreContainer from '../ExploreContainer';
+import SaveChart from '../saveChart';
+import AllChart from '../AllChart';
+
 
 const propTypes = {
   ...ExploreChartPanel.propTypes,
@@ -93,6 +96,8 @@ const propTypes = {
   vizType: PropTypes.string,
   saveAction: PropTypes.string,
   isSaveModalVisible: PropTypes.bool,
+  isSaveChartVisible: PropTypes.bool,
+  isAllChartVisible: PropTypes.bool,
 };
 
 const ExplorePanelContainer = styled.div`
@@ -182,6 +187,7 @@ const updateHistory = debounce(
       additionalParam[URL_PARAMS.datasourceId.name] = datasourceId;
       additionalParam[URL_PARAMS.datasourceType.name] = datasourceType;
     }
+    const [disablePublish,setDisablePublish] = useState(false);
 
     const urlParams = payload?.url_params || {};
     Object.entries(urlParams).forEach(([key, value]) => {
@@ -488,7 +494,6 @@ function ExploreViewContainer(props) {
     }
     return false;
   }, [lastQueriedControls, props.controls]);
-
   useChangeEffect(props.saveAction, () => {
     if (['saveas', 'overwrite'].includes(props.saveAction)) {
       onQuery();
@@ -497,6 +502,8 @@ function ExploreViewContainer(props) {
     }
   });
 
+  // useEffect(()=>{
+  // },[chartIsStale])
   useEffect(() => {
     if (props.ownState !== undefined) {
       onQuery();
@@ -558,7 +565,6 @@ function ExploreViewContainer(props) {
   if (props.standalone) {
     return renderChartContainer();
   }
-
   return (
     <ExploreContainer>
       <ConnectedExploreChartHeader
@@ -578,6 +584,7 @@ function ExploreViewContainer(props) {
         reports={props.reports}
         saveDisabled={errorMessage || props.chart.chartStatus === 'loading'}
         metadata={props.metadata}
+        chartIsStale={chartIsStale}
       />
       <ExplorePanelContainer id="explore-container">
         <Global
@@ -709,6 +716,31 @@ function ExploreViewContainer(props) {
           dashboardId={props.dashboardId}
         />
       )}
+      {props.isSaveChartVisible && (
+        <SaveChart
+        controls={props.controls}
+          addDangerToast={props.addDangerToast}
+          actions={props.actions}
+          form_data={props.form_data}
+          sliceName={props.sliceName}
+          dashboardId={props.dashboardId}
+          chart={props.chart}
+        />
+      )}
+      {props.isAllChartVisible && (
+        <AllChart
+        onOpen={props.isAllChartVisible}
+        controls={props.controls}
+          addDangerToast={props.addDangerToast}
+          actions={props.actions}
+          form_data={props.form_data}
+          sliceName={props.sliceName}
+          dashboardId={props.dashboardId}
+          chart={props.chart}
+          chartIsStale={chartIsStale}
+        />
+      )}
+      
     </ExploreContainer>
   );
 }
@@ -730,6 +762,8 @@ function mapStateToProps(state) {
     reports,
     user,
     saveModal,
+    saveChart,
+    AllChart
   } = state;
   const { controls, slice, datasource, metadata, hiddenFormData } = explore;
   const hasQueryMode = !!controls.query_mode?.value;
@@ -790,6 +824,8 @@ function mapStateToProps(state) {
     metadata,
     saveAction: explore.saveAction,
     isSaveModalVisible: saveModal.isVisible,
+    isSaveChartVisible: saveChart.isVisible,
+    isAllChartVisible: AllChart.isVisible,
   };
 }
 
