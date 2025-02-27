@@ -226,7 +226,7 @@ class ChartAPI:
             }), 500
 
 
-    # def delete_chart(slice_id):
+    def delete_chart(slice_id):
         try:
             slice_id = int(slice_id)
             chart = session.query(Charts).filter_by(slice_id=slice_id).first()

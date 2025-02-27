@@ -199,7 +199,7 @@ export const ExploreChartHeader = ({
     setPublishDisabled(charts?.checkDiff?.value)
 
   },[sliceId,charts?.checkDiff?.value])
-  
+
   const oldSliceName = slice?.slice_name;
   return (
     <>
@@ -279,9 +279,10 @@ export const ExploreChartHeader = ({
                 {t('Create new Chart')}
               </Button> */}
               <Tooltip title={
-                publishDisabled || saveDisabled || chartIsStale || sliceId === 0
-                ? t('Save the chart to publish')
-                : null
+                saveDisabled || sliceId === 0 || publishDisabled ? t('Save to publish chart')
+                :(   chartIsStale
+                ? t('Add required control values to publish')
+                :  null)
               }>
                 <span className='publish-span' >
                   <Button

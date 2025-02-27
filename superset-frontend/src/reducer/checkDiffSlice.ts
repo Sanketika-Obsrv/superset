@@ -7,7 +7,7 @@ const checkDiffSlice = createSlice({
   },
   reducers: {
     setCheckDiff: (state, action) => {
-      state.value = action.payload; 
+      state.value = action.payload;
     },
   },
 });

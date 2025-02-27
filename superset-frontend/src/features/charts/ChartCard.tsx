@@ -29,6 +29,10 @@ import { Menu } from 'src/components/Menu';
 import FaveStar from 'src/components/FaveStar';
 import FacePile from 'src/components/FacePile';
 import { handleChartDelete, CardStyles } from 'src/views/CRUD/utils';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { store } from 'src/views/store';
+import { deleteChart } from 'src/explore/components/AllChart';
 
 interface ChartCardProps {
   chart: Chart;
@@ -46,6 +50,14 @@ interface ChartCardProps {
   showThumbnails?: boolean;
   handleBulkChartExport: (chartsToExport: Chart[]) => void;
 }
+// export function handleDashboardDelete(
+//   { id, dashboard_title: dashboardTitle }: Dashboard,
+//   refreshData: (config?: FetchDataConfig | null) => void,
+//   addSuccessToast: (arg0: string) => void,
+//   addDangerToast: (arg0: string) => void,
+//   dashboardFilter?: string,
+//   userId?: string | number,
+// )
 
 export default function ChartCard({
   chart,
@@ -68,7 +80,8 @@ export default function ChartCard({
   const canDelete = hasPerm('can_write');
   const canExport = hasPerm('can_export');
   const theme = useTheme();
-
+  const dispatch = useDispatch();
+const redux_state = store.getState();
   const menu = (
     <Menu>
       {canDelete && (
@@ -77,11 +90,11 @@ export default function ChartCard({
             title={t('Please confirm')}
             description={
               <>
-                {t('Are you sure you want to delete')} <b>{chart.slice_name}</b>
+                {t('Are you sure you want to delete this chart')} <b>{chart.slice_name}</b>
                 ?
               </>
             }
-            onConfirm={() =>
+            onConfirm={() => {
               handleChartDelete(
                 chart,
                 addSuccessToast,
@@ -89,8 +102,10 @@ export default function ChartCard({
                 refreshData,
                 chartFilter,
                 userId,
-              )
-            }
+              );
+              deleteChart(chart.id);
+              
+            }}
           >
             {confirmDelete => (
               <div
@@ -98,11 +113,14 @@ export default function ChartCard({
                 role="button"
                 tabIndex={0}
                 className="action-button"
-                onClick={confirmDelete}
+                onClick={() => {
+                  confirmDelete();
+                }}
               >
-                <Icons.Trash iconSize="l" /> {t('Delete')}
+                <Icons.Trash iconSize="l" /> {t('Delete new')}
               </div>
             )}
+
           </ConfirmStatusChange>
         </Menu.Item>
       )}
@@ -181,3 +199,4 @@ export default function ChartCard({
     </CardStyles>
   );
 }
+
