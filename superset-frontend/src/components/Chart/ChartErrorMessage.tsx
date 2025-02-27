@@ -18,10 +18,12 @@
  */
 
 import { ClientErrorObject, SupersetError } from '@superset-ui/core';
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { useChartOwnerNames } from 'src/hooks/apiResources';
 import ErrorMessageWithStackTrace from 'src/components/ErrorMessage/ErrorMessageWithStackTrace';
 import { ChartSource } from 'src/types/ChartSource';
+import { setCheckDiff } from 'src/reducer/checkDiffSlice';
+import { useDispatch } from 'react-redux';
 
 export type Props = {
   chartId: string;
@@ -39,6 +41,11 @@ export type Props = {
 export const ChartErrorMessage: FC<Props> = ({ chartId, error, ...props }) => {
   const { result: owners } = useChartOwnerNames(chartId);
 
+const dispatch = useDispatch();
+useEffect(() => {
+    dispatch(setCheckDiff(true)); // Dispatch when error occurs
+  } 
+ ,[]);
   // don't mutate props
   const ownedError = error && {
     ...error,

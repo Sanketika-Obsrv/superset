@@ -1,0 +1,25 @@
+
+.dropdown-container {
+    margin: 10px 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  .dropdown-container label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    display: inline-block;
+  }
+  
+  .dropdown-container select {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+  }
+  
+  .dropdown-container option {
+    font-size: 14px;
+  }
+  

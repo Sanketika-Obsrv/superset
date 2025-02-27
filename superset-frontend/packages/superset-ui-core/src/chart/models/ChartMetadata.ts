@@ -148,7 +148,6 @@ export default class ChartMetadata {
     this.parseMethod = parseMethod;
     this.suppressContextMenu = suppressContextMenu;
   }
-
   canBeAnnotationType(type: string): boolean {
     return this.canBeAnnotationTypesLookup[type] || false;
   }

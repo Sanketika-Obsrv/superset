@@ -33,7 +33,6 @@ import VizTypeGallery, {
   MAX_ADVISABLE_VIZ_GALLERY_WIDTH,
 } from './VizTypeGallery';
 import { FastVizSwitcher } from './FastVizSwitcher';
-
 interface VizTypeControlProps {
   description?: string;
   label?: string;
@@ -86,23 +85,22 @@ const VizTypeControl = ({
   // ensuring that the modal always opens to the correct category.
   const [modalKey, setModalKey] = useState(0);
   const [selectedViz, setSelectedViz] = useState<string | null>(initialValue);
-
+  let columnEntries = '';
   const openModal = useCallback(() => {
     setShowModal(true);
   }, []);
-
+  
   const onSubmit = useCallback(() => {
     onChange(selectedViz);
     setShowModal(false);
   }, [selectedViz, onChange]);
-
   const onCancel = useCallback(() => {
     setShowModal(false);
     setModalKey(key => key + 1);
     // make sure the modal re-opens to the last submitted viz
     setSelectedViz(initialValue);
   }, [initialValue]);
-
+  
   return (
     <>
       <div
@@ -130,7 +128,7 @@ const VizTypeControl = ({
       <UnpaddedModal
         show={showModal}
         onHide={onCancel}
-        title={t('Select a visualization type')}
+        title={t('Select a visualization type and chart')}
         primaryButtonName={t('Select')}
         disablePrimaryButton={!selectedViz}
         onHandledPrimaryAction={onSubmit}
@@ -144,10 +142,14 @@ const VizTypeControl = ({
           onChange={setSelectedViz}
           onDoubleClick={onSubmit}
           denyList={denyList}
+          columnEntries={columnEntries}
         />
+          {/* console.log(columnEntries) */}
+
       </UnpaddedModal>
     </>
   );
 };
+
 
 export default VizTypeControl;

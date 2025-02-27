@@ -818,6 +818,7 @@ function ChartList(props: ChartListProps) {
               onSelect: handleBulkChartExport,
             });
           }
+          console.log("charts:",{charts})
           return (
             <ListView<Chart>
               bulkActions={bulkActions}

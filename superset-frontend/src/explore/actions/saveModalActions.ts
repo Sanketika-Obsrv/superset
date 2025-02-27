@@ -53,6 +53,19 @@ export const SET_SAVE_CHART_MODAL_VISIBILITY =
 export function setSaveChartModalVisibility(isVisible: boolean) {
   return { type: SET_SAVE_CHART_MODAL_VISIBILITY, isVisible };
 }
+// Changed
+export const NEW_SET_SAVE_CHART_MODAL_VISIBILITY =
+  'NEW_SET_SAVE_CHART_MODAL_VISIBILITY';
+export function newSetSaveChartModalVisibility(isVisible: boolean) {
+  return { type: NEW_SET_SAVE_CHART_MODAL_VISIBILITY, isVisible };
+}
+// End
+
+export const SET_ALL_CHART_MODAL_VISIBILITY =
+  'SET_ALL_CHART_MODAL_VISIBILITY';
+export function setAllChartModalVisibility(isVisible: boolean) {
+  return { type: SET_ALL_CHART_MODAL_VISIBILITY, isVisible };
+}
 
 export const SAVE_SLICE_FAILED = 'SAVE_SLICE_FAILED';
 export function saveSliceFailed() {

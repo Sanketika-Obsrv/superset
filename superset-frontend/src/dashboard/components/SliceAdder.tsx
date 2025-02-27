@@ -280,7 +280,6 @@ class SliceAdder extends Component<SliceAdderProps, SliceAdderState> {
   rowRenderer({ index, style }: { index: number; style: React.CSSProperties }) {
     const { filteredSlices, selectedSliceIdsSet } = this.state;
     const cellData = filteredSlices[index];
-
     const isSelected = selectedSliceIdsSet.has(cellData.slice_id);
     const type = CHART_TYPE;
     const id = NEW_CHART_ID;
